@@ -1,0 +1,78 @@
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(1rem, 3vw, 2rem);
+}
+
+.spinner {
+    width: clamp(40px, 8vw, 60px);
+    height: clamp(40px, 8vw, 60px);
+    border: clamp(4px, 0.8vw, 6px) solid #f3f3f3;
+    border-top: clamp(4px, 0.8vw, 6px) solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .spinner {
+        width: 45px;
+        height: 45px;
+        border-width: 4px;
+    }
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border-width: 5px;
+    }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .spinner {
+        width: 55px;
+        height: 55px;
+        border-width: 5px;
+    }
+}
+
+@media screen and (min-width: 1025px) and (max-width: 1440px) {
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border-width: 6px;
+    }
+}
+
+@media screen and (min-width: 1441px) {
+    .spinner {
+        width: 65px;
+        height: 65px;
+        border-width: 6px;
+    }
+}

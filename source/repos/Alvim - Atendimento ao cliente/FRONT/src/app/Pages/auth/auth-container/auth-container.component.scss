@@ -1,0 +1,124 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  padding: 2.5rem 2rem 1.5rem;
+  background: linear-gradient(to bottom, #f8f9fa, white);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+
+  .logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    svg {
+      filter: drop-shadow(0 4px 8px rgba(0, 123, 255, 0.3));
+    }
+  }
+
+  .auth-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary, #2c3e50);
+  }
+
+  .auth-subtitle {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--text-secondary, #6c757d);
+  }
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 2rem;
+  background: white;
+  border-bottom: 2px solid var(--border-color, #e0e0e0);
+
+  .tab-button {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary, #6c757d);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: -2px;
+
+    &:hover {
+      color: var(--primary-color, #007bff);
+      background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    &.active {
+      color: var(--primary-color, #007bff);
+      border-bottom-color: var(--primary-color, #007bff);
+    }
+  }
+}
+
+.auth-content {
+  padding: 2rem;
+
+  @media (max-width: 480px) {
+    padding: 1.5rem;
+  }
+}
+
+.auth-footer {
+  text-align: center;
+  padding: 1.5rem;
+  background-color: var(--bg-light, #f8f9fa);
+  border-top: 1px solid var(--border-color, #e0e0e0);
+
+  p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted, #adb5bd);
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .auth-page {
+    padding: 0;
+  }
+}

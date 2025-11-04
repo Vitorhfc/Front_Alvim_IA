@@ -1,0 +1,76 @@
+<div class="auth-page">
+  <app-spinner></app-spinner>
+
+  <div class="auth-card">
+    <!-- Header -->
+    <div class="auth-header">
+      <div class="logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="48" height="48" rx="12" fill="#007bff"/>
+          <path d="M24 14L34 20V28L24 34L14 28V20L24 14Z" fill="white"/>
+        </svg>
+      </div>
+      <h1 class="auth-title">{{ pageTitle }}</h1>
+      <p class="auth-subtitle">{{ pageSubtitle }}</p>
+    </div>
+
+    <!-- Tabs (Login/Cadastro) -->
+    <div class="auth-tabs" *ngIf="showTabs">
+      <button
+        class="tab-button"
+        [class.active]="currentStep === 'login'"
+        (click)="onSwitchToLogin()">
+        Login
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="currentStep === 'cadastro'"
+        (click)="onSwitchToCadastro()">
+        Cadastro
+      </button>
+    </div>
+
+    <!-- Conteúdo dinâmico baseado no step -->
+    <div class="auth-content">
+      <!-- Step 1: Login -->
+      <app-login
+        *ngIf="currentStep === 'login'"
+        (loginSuccess)="onLoginSuccess($event)"
+        (switchToCadastro)="onSwitchToCadastro()">
+      </app-login>
+
+      <!-- Step 2: Cadastro -->
+      <app-cadastro-usuario
+        *ngIf="currentStep === 'cadastro'"
+        (cadastroSuccess)="onCadastroSuccess($event)"
+        (switchToLogin)="onSwitchToLogin()">
+      </app-cadastro-usuario>
+
+      <!-- Step 3: Seleção de Método 2FA -->
+      <app-selecao-2fa
+        *ngIf="currentStep === 'selecao-2fa'"
+        [usuarioId]="authState.usuarioId!"
+        [fluxoOrigem]="authState.fluxoOrigem"
+        (metodoSelecionado)="onMetodoSelecionado($event)"
+        (cancelar)="onCancelar2FA()">
+      </app-selecao-2fa>
+
+      <!-- Step 4: Validação de Token 2FA -->
+      <app-validacao-2fa
+        *ngIf="currentStep === 'validacao-2fa'"
+        [usuarioId]="authState.usuarioId!"
+        [tipoValidacao]="authState.tipoValidacao!"
+        [destinoEnvio]="authState.destinoEnvio!"
+        [fluxoOrigem]="authState.fluxoOrigem"
+        (validacaoSucesso)="onValidacaoSucesso($event)"
+        (voltarParaSelecao)="onVoltarParaSelecao()"
+        (reenviar)="onReenviarCodigo()">
+      </app-validacao-2fa>
+    </div>
+
+    <!-- Footer -->
+    <div class="auth-footer">
+      <p>&copy; 2025 Alvim IA - Todos os direitos reservados</p>
+    </div>
+  </div>
+</div>

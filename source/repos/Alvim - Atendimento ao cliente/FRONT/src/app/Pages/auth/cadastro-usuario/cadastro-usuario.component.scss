@@ -1,0 +1,124 @@
+.cadastro-container {
+  width: 100%;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary, #2c3e50);
+  }
+
+  input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color, #007bff);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    &:disabled {
+      background-color: var(--disabled-bg, #f5f5f5);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-primary {
+  padding: 0.875rem 1.5rem;
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-hover, #0056b3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+
+  &:disabled {
+    background-color: var(--disabled-bg, #cccccc);
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.terms {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6c757d);
+  margin: 0;
+
+  a {
+    color: var(--primary-color, #007bff);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.switch-form {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6c757d);
+  }
+
+  a {
+    color: var(--primary-color, #007bff);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: var(--primary-hover, #0056b3);
+      text-decoration: underline;
+    }
+  }
+}
+
+.error-message {
+  padding: 0.875rem 1rem;
+  background-color: #fee;
+  color: #c33;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #c33;
+}

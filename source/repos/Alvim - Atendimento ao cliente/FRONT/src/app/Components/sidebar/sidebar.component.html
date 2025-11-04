@@ -1,0 +1,52 @@
+<aside class="sidebar">
+  <!-- Logo -->
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <span class="material-icons logo-icon">chat_bubble</span>
+      <span class="logo-text">AI Agent</span>
+    </div>
+  </div>
+
+  <!-- Menu Items -->
+  <nav class="sidebar-nav">
+    <a
+      *ngFor="let item of getVisibleMenuItems()"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="nav-item"
+      [title]="item.label"
+    >
+      <span class="material-icons nav-icon">{{ item.icon }}</span>
+      <span class="nav-label">{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <!-- User Footer -->
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="avatar">{{ getInitials() }}</div>
+      <div class="user-details">
+        <span class="user-name">{{ usuario?.nome || 'Usuário' }}</span>
+        <span class="user-email">{{ usuario?.email || '' }}</span>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <button
+        class="icon-btn theme-toggle"
+        (click)="toggleTheme()"
+        [title]="isDarkMode ? 'Modo Claro' : 'Modo Escuro'"
+      >
+        <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+      </button>
+
+      <button
+        class="icon-btn logout-btn"
+        (click)="logout()"
+        title="Sair"
+      >
+        <span class="material-icons">logout</span>
+      </button>
+    </div>
+  </div>
+</aside>

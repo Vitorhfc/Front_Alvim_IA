@@ -1,0 +1,116 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="dashboard-content">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-info">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Visão geral do seu agente de IA</p>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Carregando dados...</p>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!loading" class="dashboard-grid">
+      <!-- Métricas -->
+      <section class="metrics-row">
+        <div class="metric-card" *ngFor="let metric of metrics">
+          <div class="metric-header">
+            <span class="metric-title">{{ metric.title }}</span>
+            <div class="metric-icon" [style.background]="metric.iconColor">
+              <span class="material-icons">{{ metric.icon }}</span>
+            </div>
+          </div>
+          <div class="metric-value">{{ metric.value }}</div>
+          <div class="metric-change" [class.positive]="metric.changePositive" [class.negative]="!metric.changePositive">
+            <span class="material-icons change-icon">
+              {{ metric.changePositive ? 'trending_up' : 'trending_down' }}
+            </span>
+            {{ metric.change }}
+          </div>
+        </div>
+      </section>
+
+      <!-- Gráficos -->
+      <section class="charts-row">
+        <!-- Volume de Mensagens -->
+        <div class="chart-card">
+          <h3 class="card-title">Volume de Mensagens</h3>
+          <div class="chart-placeholder">
+            <span class="material-icons chart-icon">show_chart</span>
+            <p>Gráfico de linha - Volume ao longo do dia</p>
+            <small>Integração com biblioteca de gráficos pendente</small>
+          </div>
+        </div>
+
+        <!-- Categorias de Perguntas -->
+        <div class="chart-card">
+          <h3 class="card-title">Categorias de Perguntas</h3>
+          <div class="chart-placeholder">
+            <span class="material-icons chart-icon">bar_chart</span>
+            <p>Gráfico de barras - Categorias mais comuns</p>
+            <small>Integração com biblioteca de gráficos pendente</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- Conversas e Sentimentos -->
+      <section class="info-row">
+        <!-- Últimas Conversas -->
+        <div class="info-card conversas-card">
+          <h3 class="card-title">Últimas Conversas</h3>
+          <div class="conversas-list">
+            <div class="conversa-item" *ngFor="let conversa of conversasRecentes">
+              <div class="conversa-avatar">
+                <span class="material-icons">account_circle</span>
+              </div>
+              <div class="conversa-info">
+                <div class="conversa-header">
+                  <span class="conversa-nome">{{ conversa.clienteNome }}</span>
+                  <span class="conversa-status" [style.color]="getStatusColor(conversa.status)">
+                    {{ conversa.status }}
+                  </span>
+                </div>
+                <p class="conversa-mensagem">{{ conversa.ultimaMensagem }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Análise de Sentimentos -->
+        <div class="info-card sentimentos-card">
+          <h3 class="card-title">Análise de Sentimentos</h3>
+          <div class="sentimentos-chart">
+            <div class="pie-chart-placeholder">
+              <span class="material-icons chart-icon">pie_chart</span>
+              <p>Gráfico de pizza</p>
+            </div>
+            <div class="sentimentos-legend">
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #10B981;"></span>
+                <span class="legend-label">Positivo</span>
+                <span class="legend-value">{{ sentimentosData.positivo }}%</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #F59E0B;"></span>
+                <span class="legend-label">Neutro</span>
+                <span class="legend-value">{{ sentimentosData.neutro }}%</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #EF4444;"></span>
+                <span class="legend-label">Negativo</span>
+                <span class="legend-value">{{ sentimentosData.negativo }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

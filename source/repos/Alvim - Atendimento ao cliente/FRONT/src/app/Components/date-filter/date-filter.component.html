@@ -1,0 +1,44 @@
+<div class="date-filter">
+  <div class="filter-presets">
+    <button
+      *ngFor="let preset of presets"
+      class="preset-btn"
+      [class.active]="selectedPreset === preset.id"
+      (click)="selectPreset(preset.id)"
+    >
+      <span class="material-icons">{{ preset.icon }}</span>
+      <span class="preset-label">{{ preset.label }}</span>
+    </button>
+  </div>
+
+  <div class="custom-date-picker" *ngIf="showCustomDatePicker">
+    <div class="date-inputs">
+      <div class="date-input-group">
+        <label>Data Inicial</label>
+        <input
+          type="date"
+          [(ngModel)]="customStartDate"
+          [max]="maxDate"
+          class="date-input"
+        />
+      </div>
+      <div class="date-input-group">
+        <label>Data Final</label>
+        <input
+          type="date"
+          [(ngModel)]="customEndDate"
+          [max]="maxDate"
+          class="date-input"
+        />
+      </div>
+    </div>
+    <button
+      class="apply-btn"
+      (click)="applyCustomDateRange()"
+      [disabled]="!customStartDate || !customEndDate"
+    >
+      <span class="material-icons">check</span>
+      Aplicar
+    </button>
+  </div>
+</div>
