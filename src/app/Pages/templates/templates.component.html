@@ -1,0 +1,144 @@
+<div class="templates-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="templates-content">
+    <header class="page-header">
+      <div class="header-info">
+        <h1 class="page-title">Templates de Mensagens</h1>
+        <p class="page-subtitle">Gerencie respostas rápidas e padronizadas</p>
+      </div>
+      <button class="btn-primary" (click)="novoTemplate()">
+        <span class="material-icons">add</span>
+        Novo Template
+      </button>
+    </header>
+
+    <div class="templates-container">
+      <!-- Lista de Templates -->
+      <aside class="templates-list">
+        <div class="list-filters">
+          <div class="search-box">
+            <span class="material-icons">search</span>
+            <input
+              type="text"
+              placeholder="Buscar templates..."
+              [(ngModel)]="searchTerm"
+            />
+          </div>
+          <select [(ngModel)]="selectedCategoria" class="category-select">
+            <option *ngFor="let cat of categorias" [value]="cat">
+              {{ cat === 'todas' ? 'Todas as Categorias' : cat }}
+            </option>
+          </select>
+        </div>
+
+        <div class="templates-items" *ngIf="!loading">
+          <div
+            class="template-item"
+            *ngFor="let template of templatesFiltrados"
+            [class.active]="templateSelecionado?.id === template.id"
+            (click)="selecionarTemplate(template)"
+          >
+            <div class="template-header">
+              <h3 class="template-nome">{{ template.nome }}</h3>
+              <span class="status-badge" [class.ativo]="template.ativo">
+                {{ template.ativo ? 'Ativo' : 'Inativo' }}
+              </span>
+            </div>
+            <p class="template-preview">{{ template.conteudo }}</p>
+            <div class="template-footer">
+              <span class="template-categoria">{{ template.categoria }}</span>
+              <span class="template-variaveis" *ngIf="template.variaveis.length > 0">
+                {{ template.variaveis.length }} variáveis
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="loading-state" *ngIf="loading">
+          <div class="spinner"></div>
+          <p>Carregando templates...</p>
+        </div>
+      </aside>
+
+      <!-- Detalhes/Edição do Template -->
+      <section class="template-details" *ngIf="templateSelecionado">
+        <div class="details-header">
+          <h2>{{ modoEdicao ? (templateSelecionado.id ? 'Editar Template' : 'Novo Template') : 'Detalhes do Template' }}</h2>
+          <div class="details-actions" *ngIf="!modoEdicao">
+            <button class="icon-btn" (click)="editarTemplate()">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="icon-btn danger" (click)="excluirTemplate(templateSelecionado)">
+              <span class="material-icons">delete</span>
+            </button>
+            <button class="icon-btn" (click)="toggleStatus(templateSelecionado)">
+              <span class="material-icons">{{ templateSelecionado.ativo ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="details-body">
+          <div class="form-group">
+            <label>Nome do Template</label>
+            <input
+              type="text"
+              [(ngModel)]="templateSelecionado.nome"
+              [disabled]="!modoEdicao"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Categoria</label>
+            <select
+              [(ngModel)]="templateSelecionado.categoria"
+              [disabled]="!modoEdicao"
+              class="form-select"
+            >
+              <option *ngFor="let cat of categorias.slice(1)" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Conteúdo</label>
+            <textarea
+              [(ngModel)]="templateSelecionado.conteudo"
+              [disabled]="!modoEdicao"
+              rows="6"
+              class="form-textarea"
+              placeholder="Digite o conteúdo do template. Use {{ '{' }}variavel{{ '}' }} para variáveis dinâmicas."
+            ></textarea>
+            <small class="form-hint">
+              Use chaves {{ '{' }}{{ '}' }} para criar variáveis, ex: Olá {{ '{' }}nome{{ '}' }}!
+            </small>
+          </div>
+
+          <div class="form-group" *ngIf="!modoEdicao">
+            <label>Variáveis Detectadas</label>
+            <div class="variaveis-list">
+              <span class="variavel-tag" *ngFor="let variavel of templateSelecionado.variaveis">
+                {{ variavel }}
+              </span>
+              <span *ngIf="templateSelecionado.variaveis.length === 0" class="no-variaveis">
+                Nenhuma variável detectada
+              </span>
+            </div>
+          </div>
+
+          <div class="form-actions" *ngIf="modoEdicao">
+            <button class="btn-secondary" (click)="cancelarEdicao()">Cancelar</button>
+            <button class="btn-primary" (click)="salvarTemplate()">Salvar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty State -->
+      <section class="empty-state" *ngIf="!templateSelecionado && !loading">
+        <span class="material-icons empty-icon">description</span>
+        <h3>Nenhum template selecionado</h3>
+        <p>Selecione um template da lista ou crie um novo</p>
+      </section>
+    </div>
+  </main>
+</div>

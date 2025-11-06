@@ -1,0 +1,688 @@
+@use "sass:color";
+@use "../../Scss/variable.scss" as *;
+
+.page-container {
+  display: flex;
+  min-height: 100vh;
+  background: hsl(var(--background));
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+
+  @media (max-width: 1024px) {
+    margin-left: 0;
+    padding: 1.5rem;
+  }
+}
+
+// ==================== HEADER ====================
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  color: hsl(var(--muted-foreground));
+  font-size: 1rem;
+}
+
+// ==================== BUTTONS ====================
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, $primary 0%, $accent 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  svg {
+    stroke-width: 2.5;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba($primary, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  padding: 0.875rem 1.5rem;
+  background: $secondary;
+  color: $foreground;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: color.adjust($secondary, $lightness: -5%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary-sm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: $secondary;
+  color: $foreground;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: color.adjust($secondary, $lightness: -5%);
+  }
+}
+
+.btn-clear-filters {
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: $primary;
+  border: 1px solid $primary;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($primary, 0.1);
+  }
+}
+
+// ==================== MESSAGES ====================
+
+.messages {
+  margin-bottom: 1.5rem;
+}
+
+.error-message,
+.success-message {
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease;
+  margin-bottom: 0.75rem;
+}
+
+.error-message {
+  background: rgba($destructive, 0.1);
+  color: $destructive;
+  border-left: 4px solid $destructive;
+}
+
+.success-message {
+  background: rgba(#10b981, 0.1);
+  color: #059669;
+  border-left: 4px solid #10b981;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ==================== FILTERS ====================
+
+.filters-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 300px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  svg {
+    position: absolute;
+    left: 1rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
+  border: 2px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+  }
+
+  &::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+  background: $secondary;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: hsl(var(--foreground));
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($primary, 0.1);
+  }
+
+  &.active {
+    background: $primary;
+    color: white;
+  }
+}
+
+// ==================== GRID ====================
+
+.funcionarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.funcionario-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: $border-radius;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.funcionario-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.funcionario-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.funcionario-nome {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.funcionario-cargo {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba($destructive, 0.1);
+  color: $destructive;
+
+  &.active {
+    background: rgba(#10b981, 0.1);
+    color: #059669;
+  }
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: hsl(var(--foreground));
+
+  svg {
+    color: hsl(var(--muted-foreground));
+    flex-shrink: 0;
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.btn-action {
+  flex: 1;
+  padding: 0.625rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.btn-edit {
+  background: rgba($primary, 0.1);
+  color: $primary;
+
+  &:hover {
+    background: rgba($primary, 0.2);
+  }
+}
+
+.btn-toggle {
+  background: rgba($accent, 0.1);
+  color: $accent;
+
+  &:hover {
+    background: rgba($accent, 0.2);
+  }
+}
+
+.btn-delete {
+  background: rgba($destructive, 0.1);
+  color: $destructive;
+
+  &:hover {
+    background: rgba($destructive, 0.2);
+  }
+}
+
+// ==================== EMPTY STATE ====================
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  svg {
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+  }
+}
+
+// ==================== LOADING ====================
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid $secondary;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: hsl(var(--muted-foreground));
+    font-weight: 500;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ==================== MODAL ====================
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: hsl(var(--card));
+  border-radius: $border-radius;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid hsl(var(--border));
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+  }
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: $secondary;
+    color: hsl(var(--foreground));
+  }
+}
+
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+// ==================== FORM ====================
+
+.form-section {
+  margin-bottom: 2rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin-bottom: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+
+    .required {
+      color: $destructive;
+      margin-left: 0.25rem;
+    }
+  }
+
+  input,
+  select {
+    padding: 0.75rem 1rem;
+    border: 2px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+
+    &::placeholder {
+      color: hsl(var(--muted-foreground));
+    }
+  }
+}
+
+// ==================== HORÁRIOS E AUSÊNCIAS ====================
+
+.horarios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.horario-item {
+  padding: 1.5rem;
+  background: $secondary;
+  border-radius: 0.5rem;
+  position: relative;
+}
+
+.btn-remove {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba($destructive, 0.1);
+  color: $destructive;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($destructive, 0.2);
+    transform: scale(1.1);
+  }
+}
+
+.empty-message {
+  text-align: center;
+  color: hsl(var(--muted-foreground));
+  padding: 2rem;
+  font-style: italic;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid hsl(var(--border));
+}
+
+// ==================== DARK MODE ====================
+
+.dark-theme {
+  .funcionario-card {
+    &:hover {
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .horario-item {
+    background: $dark-secondary;
+  }
+}
