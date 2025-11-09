@@ -1,25 +1,42 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatRadioModule } from '@angular/material/radio';
 import { AuthService } from '../../../Service/Api/auth.service';
 import { SpinnerService } from '../../../Service/Local/spinner';
 import { SnackBar } from '../../../Service/Local/snack-bar';
 import { LoginData } from '../shared/models/auth-state.model';
+import { TipoValidacaoDuasEtapas } from '../../../Models/Objetos/auth.model';
 
+/**
+ * Componente de Login - PASSO 1 do fluxo de autenticação
+ *
+ * Fluxo:
+ * 1. Usuário insere email, senha e escolhe tipo de validação (Email ou WhatsApp)
+ * 2. Chama API de login que envia token 2FA
+ * 3. Redireciona para tela de validação 2FA
+ */
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatRadioModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  @Output() loginSuccess = new EventEmitter<{ usuarioId: string; email: string }>();
+  @Output() loginSuccess = new EventEmitter<{
+    usuarioId: string;
+    nome: string;
+    email: string;
+    tipoValidacao: 0 | 1;
+    destinoEnvio: string;
+  }>();
   @Output() switchToCadastro = new EventEmitter<void>();
 
   loginModel: LoginData = {
     email: '',
-    senha: ''
+    senha: '',
+    tipoValidacao: 0
   };
 
   loading = false;
@@ -32,42 +49,39 @@ export class LoginComponent {
   ) {}
 
   async onLogin(): Promise<void> {
-    // Limpar estado anterior
     this.errorMessage = '';
 
-    // Validar formulário
     if (!this.validateForm()) {
       this.snackBar.error(this.errorMessage);
       return;
     }
 
-    // Ativar loading
     this.loading = true;
     this.spinnerService.show();
 
     try {
-      const response = await this.authService.login(this.loginModel);
+      const response = await this.authService.login({
+        email: this.loginModel.email,
+        senha: this.loginModel.senha,
+        tipoValidacao: this.loginModel.tipoValidacao as TipoValidacaoDuasEtapas
+      });
 
-      // Login bem-sucedido
-      this.snackBar.success('Login realizado com sucesso!');
+      this.snackBar.success(response.mensagem || 'Token enviado com sucesso!');
 
-      // Emitir evento para próxima etapa (2FA)
       this.loginSuccess.emit({
         usuarioId: response.usuarioId,
-        email: this.loginModel.email
+        nome: response.nome,
+        email: response.email,
+        tipoValidacao: this.loginModel.tipoValidacao,
+        destinoEnvio: response.destinoEnvio
       });
     } catch (error: any) {
-      // Tratar erro
       this.errorMessage = error.message || 'Email ou senha inválidos';
       this.snackBar.error(this.errorMessage);
       console.error('Erro no login:', error);
     } finally {
-      // SEMPRE esconder o spinner, independente de sucesso ou erro
       this.loading = false;
       this.spinnerService.hidden();
-
-      // Debug: verificar se o spinner foi realmente escondido
-      console.log('Spinner escondido. Estado visível:', this.spinnerService.isVisible());
     }
   }
 

@@ -18,4 +18,5 @@ export interface Usuario extends BaseEntidade {
     dtaTokenAcessoGerado: Date | null;
     dtaTokenUtilizado: Date | null;
     tokenGoogle: string | null;
+    flgEmpresaPier : boolean;
 }

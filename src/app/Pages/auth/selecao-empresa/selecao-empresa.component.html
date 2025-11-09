@@ -1,0 +1,57 @@
+<div class="selecao-empresa-container">
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="empresas-list">
+    <div
+      *ngFor="let empresa of empresas"
+      class="empresa-card"
+      [class.selected]="empresaSelecionadaId === empresa.empresaId"
+      (click)="empresaSelecionadaId = empresa.empresaId">
+      <div class="empresa-info">
+        <div class="empresa-nome">{{ empresa.nomeEmpresa }}</div>
+        <div class="empresa-badge" *ngIf="empresa.flgAdministrador">
+          <span class="badge-admin">Administrador</span>
+        </div>
+      </div>
+      <div class="radio-check">
+        <input
+          type="radio"
+          [id]="'empresa-' + empresa.empresaId"
+          name="empresa"
+          [value]="empresa.empresaId"
+          [(ngModel)]="empresaSelecionadaId"
+          [disabled]="loading">
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button
+      type="button"
+      class="btn-primary"
+      (click)="onSelecionarEmpresa()"
+      [disabled]="!empresaSelecionadaId || loading">
+      <span *ngIf="!loading">Acessar</span>
+      <span *ngIf="loading">Acessando...</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn-nova-empresa"
+      (click)="onCadastrarNovaEmpresa()"
+      [disabled]="loading">
+      <span *ngIf="!loading">+ Cadastrar Nova Empresa</span>
+      <span *ngIf="loading">Processando...</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn-secondary"
+      (click)="onVoltarParaLogin()"
+      [disabled]="loading">
+      Voltar
+    </button>
+  </div>
+</div>

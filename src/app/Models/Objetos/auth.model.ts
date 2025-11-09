@@ -14,6 +14,7 @@ export enum TipoValidacaoDuasEtapas {
 export interface LoginModel {
     email: string;
     senha: string;
+    tipoValidacao: TipoValidacaoDuasEtapas;
 }
 
 export interface LoginResponseModel {
@@ -21,6 +22,43 @@ export interface LoginResponseModel {
     nome: string;
     email: string;
     requerValidacaoDuasEtapas: boolean;
+    temEmail: boolean;
+    temWhatsApp: boolean;
+    destinoEnvio: string;
+    mensagem: string;
+}
+
+export interface ValidarToken2FAModel {
+    usuarioId: string;
+    token: string;
+    tipoValidacao: TipoValidacaoDuasEtapas;
+}
+
+export interface ValidarToken2FAResponseModel {
+    empresas: EmpresaVinculadaModel[];
+}
+
+export interface SelecionarEmpresaModel {
+    usuarioId: string;
+    empresaId: string;
+}
+
+export interface LoginUsuarioModel {
+    usuarioId: string;
+    tipoValidacao?: TipoValidacaoDuasEtapas; // Opcional - não necessário para login direto ADM
+}
+
+export interface LoginUsuarioResponseModel {
+    usuarioId: string;
+    nome: string;
+    email: string;
+    celular?: string;
+    token: string;
+    dataExpiracao: string;
+    empresas: EmpresaVinculadaModel[];
+    requerValidacaoDuasEtapas?: boolean; // Opcional - quando não há 2FA
+    destinoEnvio?: string; // Opcional - quando não há 2FA
+    mensagem?: string; // Opcional
 }
 
 export interface LoginEmpresaModel {
@@ -60,6 +98,7 @@ export interface AutenticacaoClientCompletaResponseModel {
     dataExpiracao: string;
     proximoReloginObrigatorio: string;
     tokenGoogle?: string;
+    flgEmpresaPier : boolean;
 }
 
 // ==================== CONFIRMAÇÃO 2FA - ADMIN ====================

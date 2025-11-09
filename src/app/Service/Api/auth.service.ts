@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../Environment/Environment';
 import { LocalStorageService } from '../Local/local-storage';
-import { LoginModel, LoginResponseModel, LoginEmpresaModel, SolicitarValidacaoDuasEtapasModel, ValidacaoDuasEtapasResponseModel, ConfirmarValidacaoDuasEtapasClientModel, AutenticacaoClientCompletaResponseModel, UsuarioModel } from '../../Models/Objetos/auth.model';
+import { LoginModel, LoginResponseModel, LoginEmpresaModel, SolicitarValidacaoDuasEtapasModel, ValidacaoDuasEtapasResponseModel, ConfirmarValidacaoDuasEtapasClientModel, AutenticacaoClientCompletaResponseModel, UsuarioModel, ValidarToken2FAModel, ValidarToken2FAResponseModel, SelecionarEmpresaModel, LoginUsuarioModel, LoginUsuarioResponseModel } from '../../Models/Objetos/auth.model';
 import { ApiResponse } from '../../Models/Objetos/resposta.model';
 
 @Injectable({
@@ -20,17 +20,115 @@ export class AuthService {
 
   // ==================== LOGIN (CLIENT) ====================
 
+  /**
+   * PASSO 1: Login inicial - Envia credenciais e recebe informações de 2FA
+   * Endpoint: POST /api/Autenticacao/login
+   *
+   * Fluxo:
+   * - Usuário envia email, senha e tipo de validação (0=Email, 1=WhatsApp)
+   * - Sistema envia token de validação para o destino escolhido
+   * - Retorna informações do usuário e destino de envio do token
+   */
   async login(model: LoginModel): Promise<LoginResponseModel> {
+    const response = await firstValueFrom(
+      this.http.post<ApiResponse<LoginResponseModel>>(
+        `${this.CLIENT_API}/Autenticacao/login`,
+        model
+      )
+    );
+
+    if (!response.sucesso)
+      throw new Error(response.error || 'Erro ao realizar login');
+
+
+    return response.data;
+  }
+
+  /**
+   * PASSO 2: Validação do token 2FA - Valida o código recebido
+   * Endpoint: POST /api/Autenticacao/validar-token-2fa
+   *
+   * Fluxo:
+   * - Usuário envia o token de 6 dígitos recebido
+   * - Sistema valida o token
+   * - Retorna lista de empresas vinculadas ao usuário
+   */
+  async validarToken2FA(model: ValidarToken2FAModel): Promise<ValidarToken2FAResponseModel> {
     try {
       const response = await firstValueFrom(
-        this.http.post<ApiResponse<LoginResponseModel>>(
-          `${this.CLIENT_API}/Autenticacao/login`,
+        this.http.post<ApiResponse<ValidarToken2FAResponseModel>>(
+          `${this.CLIENT_API}/Autenticacao/validar-token-2fa`,
           model
         )
       );
 
       if (!response.sucesso) {
-        throw new Error(response.mensagem || 'Erro ao realizar login');
+        throw new Error(response.mensagem || 'Token inválido');
+      }
+
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.error?.mensagem ||
+        error.message ||
+        'Erro ao validar token'
+      );
+    }
+  }
+
+  /**
+   * PASSO 3A: Seleção de empresa existente - Login completo no CLIENT
+   * Endpoint: POST /api/Autenticacao/selecionar-empresa
+   *
+   * Fluxo:
+   * - Usuário seleciona uma empresa da lista
+   * - Sistema autentica o usuário na empresa selecionada
+   * - Retorna token JWT final para acesso ao sistema CLIENT
+   */
+  async selecionarEmpresa(model: SelecionarEmpresaModel): Promise<AutenticacaoClientCompletaResponseModel> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post<ApiResponse<AutenticacaoClientCompletaResponseModel>>(
+          `${this.CLIENT_API}/Autenticacao/selecionar-empresa`,
+          model
+        )
+      );
+
+      if (!response.sucesso) {
+        throw new Error(response.mensagem || 'Erro ao selecionar empresa');
+      }
+
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.error?.mensagem ||
+        error.message ||
+        'Erro ao conectar com o servidor'
+      );
+    }
+  }
+
+  /**
+   * PASSO 3B: Login no ADMIN para cadastro de empresa
+   * Endpoint: POST /api/Autenticacao/login-usuario (ADMIN)
+   *
+   * Fluxo:
+   * - Usado quando usuário opta por criar nova empresa
+   * - Autentica o usuário no sistema ADMIN
+   * - Retorna token ADM temporário para cadastrar empresa
+   * - Token ADM será descartado após cadastro da empresa
+   */
+  async loginUsuario(model: LoginUsuarioModel): Promise<LoginUsuarioResponseModel> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post<ApiResponse<LoginUsuarioResponseModel>>(
+          `${this.ADMIN_API}/Autenticacao/login-usuario`,
+          model
+        )
+      );
+
+      if (!response.sucesso) {
+        throw new Error(response.mensagem || 'Erro ao realizar login de usuário');
       }
 
       return response.data;
@@ -132,6 +230,16 @@ export class AuthService {
 
   // ==================== CADASTRO (ADMIN) ====================
 
+  /**
+   * FLUXO DE CADASTRO - PASSO 1: Cadastrar novo usuário
+   * Endpoint: POST /api/Usuario/cadastrar (ADMIN)
+   *
+   * Fluxo de cadastro:
+   * 1. Cadastrar usuário (este método)
+   * 2. Fazer login no ADMIN com usuarioId (loginUsuario)
+   * 3. Cadastrar empresa no ADMIN (EmpresaService.cadastrarEmpresa)
+   * 4. Fazer login no CLIENT com empresa criada (selecionarEmpresa)
+   */
   async cadastrarUsuario(model: UsuarioModel): Promise<any> {
     try {
       const response = await firstValueFrom(
@@ -142,13 +250,13 @@ export class AuthService {
       );
 
       if (!response.sucesso) {
-        throw new Error(response.mensagem || 'Erro ao realizar cadastro');
+        throw new Error(response.error || 'Erro ao realizar cadastro');
       }
 
       return response.data;
     } catch (error: any) {
       throw new Error(
-        error.error?.mensagem ||
+        error.error ||
         error.message ||
         'Erro ao cadastrar usuário'
       );

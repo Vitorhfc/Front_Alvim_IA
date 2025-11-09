@@ -6,33 +6,27 @@
   <form (ngSubmit)="onLogin()" class="auth-form">
     <div class="form-group">
       <label for="login-email">E-mail</label>
-      <input
-        type="email"
-        id="login-email"
-        [(ngModel)]="loginModel.email"
-        name="email"
-        placeholder="seu@email.com"
-        [disabled]="loading"
-        required
-        autocomplete="email">
+      <input type="email" id="login-email" [(ngModel)]="loginModel.email" name="email" placeholder="seu@email.com"
+        [disabled]="loading" required autocomplete="email">
     </div>
 
     <div class="form-group">
       <label for="login-senha">Senha</label>
-      <input
-        type="password"
-        id="login-senha"
-        [(ngModel)]="loginModel.senha"
-        name="senha"
-        placeholder="••••••••"
-        [disabled]="loading"
-        required
-        autocomplete="current-password">
+      <input type="password" id="login-senha" [(ngModel)]="loginModel.senha" name="senha" placeholder="••••••••"
+        [disabled]="loading" required autocomplete="current-password">
+    </div>
+
+    <div class="form-group centralizar" *ngIf="false">
+      <label>Receber código de validação por</label>
+      <mat-radio-group [(ngModel)]="loginModel.tipoValidacao" name="tipoValidacao" [disabled]="loading" required>
+        <mat-radio-button [value]="0">E-mail</mat-radio-button>
+        <mat-radio-button [value]="1">WhatsApp</mat-radio-button>
+      </mat-radio-group>
     </div>
 
     <button type="submit" class="btn-primary" [disabled]="loading">
       <span *ngIf="!loading">Entrar</span>
-      <span *ngIf="loading">Entrando...</span>
+      <span *ngIf="loading">Enviando código...</span>
     </button>
 
     <a href="#" class="forgot-password">Esqueci minha senha</a>

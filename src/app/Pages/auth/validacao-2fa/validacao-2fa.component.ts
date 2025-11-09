@@ -3,9 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../Service/Api/auth.service';
 import { SpinnerService } from '../../../Service/Local/spinner';
-import { TipoValidacaoDuasEtapas } from '../../../Models/Objetos/auth.model';
+import { TipoValidacaoDuasEtapas, EmpresaVinculadaModel } from '../../../Models/Objetos/auth.model';
 import { Validacao2FAData } from '../shared/models/auth-state.model';
+import { SnackBar } from '../../../Service/Local/snack-bar';
 
+/**
+ * Componente de Validação 2FA - PASSO 2 do fluxo de autenticação
+ *
+ * Fluxo:
+ * 1. Usuário recebe token de 6 dígitos por email ou WhatsApp
+ * 2. Insere o token neste componente
+ * 3. Sistema valida o token e retorna lista de empresas
+ * 4. Redireciona para tela de seleção de empresa
+ */
 @Component({
   selector: 'app-validacao-2fa',
   standalone: true,
@@ -15,12 +25,15 @@ import { Validacao2FAData } from '../shared/models/auth-state.model';
 })
 export class Validacao2FAComponent implements AfterViewInit {
   @Input() usuarioId!: string;
-  @Input() tipoValidacao!: 'Email' | 'WhatsApp';
+  @Input() tipoValidacao!: 0 | 1;
   @Input() destinoEnvio!: string;
-  @Input() fluxoOrigem: 'login' | 'cadastro' = 'login';
+  @Input() fluxoOrigem: 'login' | 'cadastro' | 'empresa' = 'login';
 
-  @Output() validacaoSucesso = new EventEmitter<Validacao2FAData>();
-  @Output() voltarParaSelecao = new EventEmitter<void>();
+  @Output() validacaoSucesso = new EventEmitter<{
+    empresas: EmpresaVinculadaModel[];
+    requiresCadastroEmpresa: boolean;
+  }>();
+  @Output() voltarParaLogin = new EventEmitter<void>();
   @Output() reenviar = new EventEmitter<void>();
 
   tokenDigits: string[] = ['', '', '', '', '', ''];
@@ -30,7 +43,8 @@ export class Validacao2FAComponent implements AfterViewInit {
 
   constructor(
     private authService: AuthService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private snackBar: SnackBar
   ) {}
 
   ngAfterViewInit(): void {
@@ -52,39 +66,31 @@ export class Validacao2FAComponent implements AfterViewInit {
     this.spinnerService.show();
 
     try {
-      const tipoEnum = this.tipoValidacao === 'Email'
-        ? TipoValidacaoDuasEtapas.Email
-        : TipoValidacaoDuasEtapas.WhatsApp;
-
-      // TODO: Implementar contador de tentativas (máx 3-5 tentativas)
-      // TODO: Adicionar tempo de expiração do código (ex: 5 minutos)
-
-      const response = await this.authService.confirmarValidacao2FA({
+      // Chama API para validar token 2FA
+      // Retorna lista de empresas vinculadas ao usuário
+      const response = await this.authService.validarToken2FA({
         usuarioId: this.usuarioId,
-        empresaId: '',
         token: tokenCompleto,
-        tipoValidacao: tipoEnum
+        tipoValidacao: this.tipoValidacao as TipoValidacaoDuasEtapas
       });
 
-      this.authService.salvarDadosAutenticacao(response);
-
-      this.successMessage = 'Validação realizada com sucesso!';
+      this.successMessage = 'Token validado com sucesso!';
+      this.snackBar.success(this.successMessage);
 
       const requiresCadastroEmpresa = this.fluxoOrigem === 'cadastro';
 
-      // TODO: Registrar login no histórico de acessos
-      // TODO: Enviar notificação de novo acesso para email/WhatsApp
-
+      // Emitir evento para próxima etapa:
+      // - Se fluxo de login: vai para seleção de empresa
+      // - Se fluxo de cadastro: vai direto para cadastro de empresa
       this.validacaoSucesso.emit({
-        sucesso: true,
+        empresas: response.empresas,
         requiresCadastroEmpresa
       });
     } catch (error: any) {
       this.errorMessage = error.message || 'Código inválido. Tente novamente.';
+      this.snackBar.error(this.errorMessage);
       this.limparToken();
       console.error('Erro ao confirmar validação 2FA:', error);
-      // TODO: Exibir erro usando SnackBar
-      // TODO: Bloquear após muitas tentativas inválidas
     } finally {
       this.loading = false;
       this.spinnerService.hidden();
@@ -143,14 +149,14 @@ export class Validacao2FAComponent implements AfterViewInit {
     }
   }
 
-  onVoltarParaSelecao(): void {
-    this.voltarParaSelecao.emit();
+  onVoltarParaLogin(): void {
+    this.voltarParaLogin.emit();
   }
 
   onReenviarCodigo(): void {
     this.limparToken();
     this.errorMessage = '';
-    this.successMessage = 'Código reenviado! Verifique seu ' + (this.tipoValidacao === 'Email' ? 'e-mail' : 'WhatsApp');
+    this.successMessage = 'Código reenviado! Verifique seu ' + (this.tipoValidacao === 0 ? 'e-mail' : 'WhatsApp');
     this.reenviar.emit();
   }
 
@@ -172,6 +178,10 @@ export class Validacao2FAComponent implements AfterViewInit {
 
   get tituloBotao(): string {
     if (this.loading) return 'Verificando...';
-    return this.fluxoOrigem === 'cadastro' ? 'Continuar Cadastro' : 'Confirmar';
+    return this.fluxoOrigem === 'cadastro' ? 'Continuar Cadastro' : 'Validar Token';
+  }
+
+  get getTipoValidacaoTexto(): string {
+    return this.tipoValidacao === 0 ? 'E-mail' : 'WhatsApp';
   }
 }

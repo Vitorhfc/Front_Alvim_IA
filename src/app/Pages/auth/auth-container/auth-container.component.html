@@ -46,16 +46,7 @@
         (switchToLogin)="onSwitchToLogin()">
       </app-cadastro-usuario>
 
-      <!-- Step 3: Seleção de Método 2FA -->
-      <app-selecao-2fa
-        *ngIf="currentStep === 'selecao-2fa'"
-        [usuarioId]="authState.usuarioId!"
-        [fluxoOrigem]="authState.fluxoOrigem"
-        (metodoSelecionado)="onMetodoSelecionado($event)"
-        (cancelar)="onCancelar2FA()">
-      </app-selecao-2fa>
-
-      <!-- Step 4: Validação de Token 2FA -->
+      <!-- Step 2: Validação de Token 2FA -->
       <app-validacao-2fa
         *ngIf="currentStep === 'validacao-2fa'"
         [usuarioId]="authState.usuarioId!"
@@ -63,9 +54,28 @@
         [destinoEnvio]="authState.destinoEnvio!"
         [fluxoOrigem]="authState.fluxoOrigem"
         (validacaoSucesso)="onValidacaoSucesso($event)"
-        (voltarParaSelecao)="onVoltarParaSelecao()"
+        (voltarParaLogin)="onVoltarParaLogin()"
         (reenviar)="onReenviarCodigo()">
       </app-validacao-2fa>
+
+      <!-- Step 3: Seleção de Empresa -->
+      <app-selecao-empresa
+        *ngIf="currentStep === 'selecao-empresa'"
+        [usuarioId]="authState.usuarioId!"
+        [empresas]="authState.empresas || []"
+        (empresaSelecionada)="onEmpresaSelecionada()"
+        (cadastrarNovaEmpresa)="onCadastrarNovaEmpresa()"
+        (voltarParaLogin)="onVoltarParaLogin()">
+      </app-selecao-empresa>
+
+      <!-- Step 4: Cadastro de Empresa -->
+      <app-cadastro-empresa
+        *ngIf="currentStep === 'cadastro-empresa'"
+        [usuarioId]="authState.usuarioId!"
+        [usarFluxoAuth]="true"
+        (empresaCadastradaComSucesso)="onEmpresaCadastradaComSucesso()"
+        (voltarParaSelecao)="onVoltarParaSelecaoEmpresa()">
+      </app-cadastro-empresa>
     </div>
 
     <!-- Footer -->

@@ -60,9 +60,13 @@ export class EmpresaService {
 
   /**
    * Obtém headers com token de autenticação
+   * Prioriza o token ADM temporário quando disponível (usado no cadastro de empresa)
    */
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    // Verificar se existe token ADM temporário (usado durante cadastro de empresa)
+    const tempAdmToken = localStorage.getItem('temp_admin_token');
+    const token = tempAdmToken || localStorage.getItem('token');
+
     return new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': token ? `Bearer ${token}` : ''

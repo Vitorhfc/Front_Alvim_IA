@@ -128,7 +128,16 @@ body {
     }
 
     &::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, color.adjust($primary, $lightness: -10%), color.adjust($accent, $lightness: -10%));
+        background: linear-gradient(
+            135deg,
+            color.adjust($primary, $lightness: -10%),
+            color.adjust($accent, $lightness: -10%)
+        );
     }
 }
 
+.centralizar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -60,7 +60,7 @@ export class Selecao2FAComponent {
 
       // TODO: Exibir mensagem de sucesso informando onde o código foi enviado
       this.metodoSelecionado.emit({
-        tipoValidacao: tipo === TipoValidacaoDuasEtapas.Email ? 'Email' : 'WhatsApp',
+        tipoValidacao: tipo,
         destinoEnvio: response.destinoEnvio
       });
     } catch (error: any) {

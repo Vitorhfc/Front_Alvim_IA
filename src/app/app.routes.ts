@@ -3,7 +3,7 @@ import { deslogadoGuard } from './Guard/deslogado-guard';
 import { logadoGuard } from './Guard/logado-guard';
 import { AuthContainerComponent } from './Pages/auth/auth-container/auth-container.component';
 import { LoginEmpresaComponent } from './Pages/auth/login-empresa/login-empresa.component';
-import { CadastroEmpresaComponent } from './Pages/Login/cadastro-empresa/cadastro-empresa';
+import { CadastroEmpresaComponent } from './Pages/auth/cadastro-empresa/cadastro-empresa.component';
 import { HomeComponent } from './Pages/home.component/home.component';
 import { DashboardComponent } from './Pages/dashboard/dashboard.component';
 import { ConversasComponent } from './Pages/conversas/conversas.component';
@@ -37,7 +37,7 @@ export const routes: Routes = [
     {
         path: 'cadastro-empresa',
         component: CadastroEmpresaComponent,
-        canActivate: [deslogadoGuard],
+        // Sem guard - permite acesso tanto logado quanto deslogado
         title: 'Cadastro de Empresa - AI Agent'
     },
 

@@ -10,7 +10,7 @@
 
   <div class="content">
     <h3>Código de Verificação</h3>
-    <p class="subtitle">Digite o código de 6 dígitos enviado para:</p>
+    <p class="subtitle">Digite o código de 6 dígitos enviado para seu {{ getTipoValidacaoTexto }}:</p>
     <p class="destination">{{ destinoEnvio }}</p>
 
     <div class="digit-inputs">
@@ -37,17 +37,17 @@
     </button>
 
     <div class="action-buttons">
-      <button
+      <!-- <button
         class="btn-link"
         (click)="onReenviarCodigo()"
         [disabled]="loading">
         Reenviar código
-      </button>
+      </button> -->
       <button
         class="btn-link"
-        (click)="onVoltarParaSelecao()"
+        (click)="onVoltarParaLogin()"
         [disabled]="loading">
-        Usar outro método
+        Voltar ao login
       </button>
     </div>
   </div>
