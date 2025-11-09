@@ -1,0 +1,55 @@
+<div class="login-empresa-container">
+  <div class="login-empresa-card">
+    <!-- Logo/Branding -->
+    <div class="brand-section">
+      <h1 class="brand-title">Alvim IA</h1>
+      <p class="brand-subtitle">Atendimento Inteligente ao Cliente</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading && !error" class="loading-section">
+      <div class="spinner"></div>
+      <h2>Realizando autenticação...</h2>
+      <p>Aguarde enquanto validamos suas credenciais</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-section">
+      <div class="error-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <h2>Erro na Autenticação</h2>
+      <p class="error-message">{{ error }}</p>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" (click)="tentarNovamente()">
+          Tentar Novamente
+        </button>
+        <button class="btn btn-secondary" (click)="voltarParaHome()">
+          Voltar para Home
+        </button>
+      </div>
+    </div>
+
+    <!-- Success State (briefly shown before redirect) -->
+    <div *ngIf="!loading && !error" class="success-section">
+      <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <h2>Login realizado com sucesso!</h2>
+      <p>Redirecionando para o dashboard...</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>ID da Empresa: <strong>{{ empresaId || 'Não informado' }}</strong></p>
+    </div>
+  </div>
+</div>

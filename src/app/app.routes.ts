@@ -2,10 +2,10 @@ import { Routes } from '@angular/router';
 import { deslogadoGuard } from './Guard/deslogado-guard';
 import { logadoGuard } from './Guard/logado-guard';
 import { AuthContainerComponent } from './Pages/auth/auth-container/auth-container.component';
+import { LoginEmpresaComponent } from './Pages/auth/login-empresa/login-empresa.component';
 import { CadastroEmpresaComponent } from './Pages/Login/cadastro-empresa/cadastro-empresa';
 import { HomeComponent } from './Pages/home.component/home.component';
 import { DashboardComponent } from './Pages/dashboard/dashboard.component';
-import { AdminDashboardComponent } from './Pages/admin-dashboard/admin-dashboard.component';
 import { ConversasComponent } from './Pages/conversas/conversas.component';
 import { AnalisesComponent } from './Pages/analises/analises.component';
 import { TemplatesComponent } from './Pages/templates/templates.component';
@@ -29,6 +29,12 @@ export const routes: Routes = [
         title: 'Login e Cadastro - AI Agent'
     },
     {
+        path: 'login-empresa/:empresaId',
+        component: LoginEmpresaComponent,
+        canActivate: [deslogadoGuard],
+        title: 'Login Empresa - AI Agent'
+    },
+    {
         path: 'cadastro-empresa',
         component: CadastroEmpresaComponent,
         canActivate: [deslogadoGuard],
@@ -43,29 +49,25 @@ export const routes: Routes = [
         title: 'Dashboard - AI Agent'
     },
     {
-        path: 'admin-dashboard',
-        component: AdminDashboardComponent,
-        canActivate: [logadoGuard],
-        title: 'Dashboard Administrativa - AI Agent'
-    },
-    {
         path: 'conversas',
         component: ConversasComponent,
         canActivate: [logadoGuard],
         title: 'Conversas - AI Agent'
     },
-    {
-        path: 'analises',
-        component: AnalisesComponent,
-        canActivate: [logadoGuard],
-        title: 'Análises Avançadas - AI Agent'
-    },
-    {
-        path: 'templates',
-        component: TemplatesComponent,
-        canActivate: [logadoGuard],
-        title: 'Templates de Mensagens - AI Agent'
-    },
+    // ==================== ROTAS TEMPORARIAMENTE DESABILITADAS ====================
+    // {
+    //     path: 'analises',
+    //     component: AnalisesComponent,
+    //     canActivate: [logadoGuard],
+    //     title: 'Análises Avançadas - AI Agent'
+    // },
+    // {
+    //     path: 'templates',
+    //     component: TemplatesComponent,
+    //     canActivate: [logadoGuard],
+    //     title: 'Templates de Mensagens - AI Agent'
+    // },
+    // ==================== FIM ROTAS DESABILITADAS ====================
     {
         path: 'base-conhecimento',
         component: BaseConhecimentoComponent,
@@ -78,18 +80,20 @@ export const routes: Routes = [
         canActivate: [logadoGuard],
         title: 'Configurações - AI Agent'
     },
-    {
-        path: 'funcionarios',
-        component: FuncionariosComponent,
-        canActivate: [logadoGuard],
-        title: 'Gerenciamento de Funcionários - AI Agent'
-    },
-    {
-        path: 'agendamentos',
-        component: AgendamentosComponent,
-        canActivate: [logadoGuard],
-        title: 'Agendamentos - AI Agent'
-    },
+    // ==================== ROTAS TEMPORARIAMENTE DESABILITADAS ====================
+    // {
+    //     path: 'funcionarios',
+    //     component: FuncionariosComponent,
+    //     canActivate: [logadoGuard],
+    //     title: 'Gerenciamento de Funcionários - AI Agent'
+    // },
+    // {
+    //     path: 'agendamentos',
+    //     component: AgendamentosComponent,
+    //     canActivate: [logadoGuard],
+    //     title: 'Agendamentos - AI Agent'
+    // },
+    // ==================== FIM ROTAS DESABILITADAS ====================
     // ==================== FALLBACK ====================
     {
         path: '**',

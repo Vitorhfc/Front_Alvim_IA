@@ -9,6 +9,7 @@ interface MenuItem {
   label: string;
   route: string;
   adminOnly?: boolean;
+  disabled?: boolean; // Flag para desabilitar temporariamente itens do menu
 }
 
 @Component({
@@ -25,12 +26,11 @@ export class SidebarComponent implements OnInit {
 
   menuItems: MenuItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
-    { icon: 'admin_panel_settings', label: 'Admin Dashboard', route: '/admin-dashboard', adminOnly: true },
     { icon: 'chat', label: 'Conversas', route: '/conversas' },
-    { icon: 'event', label: 'Agendamentos', route: '/agendamentos' },
-    { icon: 'people', label: 'Funcionários', route: '/funcionarios' },
-    { icon: 'analytics', label: 'Análises', route: '/analises' },
-    { icon: 'description', label: 'Templates', route: '/templates' },
+    { icon: 'event', label: 'Agendamentos', route: '/agendamentos', disabled: true }, // Desabilitado temporariamente
+    { icon: 'people', label: 'Funcionários', route: '/funcionarios', disabled: true }, // Desabilitado temporariamente
+    { icon: 'analytics', label: 'Análises', route: '/analises', disabled: true }, // Desabilitado temporariamente
+    { icon: 'description', label: 'Templates', route: '/templates', disabled: true }, // Desabilitado temporariamente
     { icon: 'menu_book', label: 'Base de Conhecimento', route: '/base-conhecimento' },
     { icon: 'settings', label: 'Configurações', route: '/configuracoes' }
   ];
@@ -88,6 +88,11 @@ export class SidebarComponent implements OnInit {
 
   getVisibleMenuItems(): MenuItem[] {
     return this.menuItems.filter(item => {
+      // Não exibe itens desabilitados
+      if (item.disabled) {
+        return false;
+      }
+      // Só exibe itens adminOnly para administradores
       if (item.adminOnly) {
         return this.isAdministrador;
       }

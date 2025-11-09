@@ -23,6 +23,10 @@ export interface LoginResponseModel {
     requerValidacaoDuasEtapas: boolean;
 }
 
+export interface LoginEmpresaModel {
+    empresaId: string;
+}
+
 // ==================== VALIDAÇÃO 2FA ====================
 
 export interface SolicitarValidacaoDuasEtapasModel {

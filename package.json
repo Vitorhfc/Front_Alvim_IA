@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:Projeto": "node dist/Projeto/server/server.mjs"
+    "serve:ssr:Projeto": "node dist/Projeto/server/server.mjs",
+    "buildAzureDev": "ng build --output-hashing=all --configuration=development && gulp gzip-dev"
   },
   "prettier": {
     "printWidth": 100,
@@ -45,6 +46,9 @@
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.17.19",
+    "gulp": "^5.0.0",
+    "gulp-azure-storage": "^0.10.0",
+    "gulp-gzip": "^1.4.2",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

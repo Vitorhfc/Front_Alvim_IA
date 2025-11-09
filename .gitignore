@@ -1,3 +1,5 @@
-node_modules
 .angular
+.claude
 .vscode
+dist
+node_modules

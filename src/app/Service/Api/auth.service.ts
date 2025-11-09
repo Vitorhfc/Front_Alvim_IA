@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../Environment/Environment';
 import { LocalStorageService } from '../Local/local-storage';
-import { LoginModel, LoginResponseModel, SolicitarValidacaoDuasEtapasModel, ValidacaoDuasEtapasResponseModel, ConfirmarValidacaoDuasEtapasClientModel, AutenticacaoClientCompletaResponseModel, UsuarioModel } from '../../Models/Objetos/auth.model';
+import { LoginModel, LoginResponseModel, LoginEmpresaModel, SolicitarValidacaoDuasEtapasModel, ValidacaoDuasEtapasResponseModel, ConfirmarValidacaoDuasEtapasClientModel, AutenticacaoClientCompletaResponseModel, UsuarioModel } from '../../Models/Objetos/auth.model';
 import { ApiResponse } from '../../Models/Objetos/resposta.model';
 
 @Injectable({
@@ -31,6 +31,29 @@ export class AuthService {
 
       if (!response.sucesso) {
         throw new Error(response.mensagem || 'Erro ao realizar login');
+      }
+
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.error?.mensagem ||
+        error.message ||
+        'Erro ao conectar com o servidor'
+      );
+    }
+  }
+
+  async loginEmpresa(model: LoginEmpresaModel): Promise<AutenticacaoClientCompletaResponseModel> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post<ApiResponse<AutenticacaoClientCompletaResponseModel>>(
+          `${this.CLIENT_API}/Autenticacao/login-empresa`,
+          model
+        )
+      );
+
+      if (!response.sucesso) {
+        throw new Error(response.mensagem || 'Erro ao realizar login da empresa');
       }
 
       return response.data;
