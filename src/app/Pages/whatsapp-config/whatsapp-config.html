@@ -1,0 +1,194 @@
+<main class="whatsapp-content">
+    <header class="page-header">
+        <div class="header-info">
+            <h1 class="page-title">Configuração WhatsApp</h1>
+            <p class="page-subtitle">Gerencie a conexão e configurações do seu WhatsApp Business</p>
+        </div>
+    </header>
+
+    <div class="config-container" *ngIf="!carregando">
+
+        <!-- Status da Conexão -->
+        <section class="status-card" [ngClass]="statusClass">
+            <div class="status-header">
+                <div class="status-info">
+                    <span class="material-icons status-icon" [class.rotating]="statusConexao.status === 'connecting'">
+                        {{ statusIcon }}
+                    </span>
+                    <div>
+                        <h2 class="status-title">{{ statusTexto }}</h2>
+                        <p class="status-message">{{ statusConexao.mensagem }}</p>
+                    </div>
+                </div>
+
+                <div class="status-actions">
+                    <button *ngIf="statusConexao.status === 'connected'" class="btn-danger" (click)="desconectar()"
+                        [disabled]="conectando">
+                        <span class="material-icons">power_settings_new</span>
+                        Desconectar
+                    </button>
+
+                    <button *ngIf="statusConexao.status === 'disconnected' || statusConexao.status === 'error'" class="btn-primary"
+                        (click)="iniciarConexao()" [disabled]="conectando">
+                        <span class="material-icons">qr_code_scanner</span>
+                        {{ statusConexao.status === 'error' ? 'Tentar Novamente' : 'Conectar WhatsApp' }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Telefone Conectado -->
+            <div class="connected-phone" *ngIf="statusConexao.status === 'connected' && statusConexao.telefone">
+                <span class="material-icons">phone_iphone</span>
+                <div>
+                    <span class="phone-label">Telefone conectado:</span>
+                    <span class="phone-number">{{ statusConexao.telefone }}</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- QR Code -->
+        <section class="qr-section" *ngIf="statusConexao.status === 'qr' && statusConexao.qrCode">
+            <div class="qr-card">
+                <div class="qr-header">
+                    <h3>Escaneie o QR Code</h3>
+                    <p>Abra o WhatsApp no seu celular e escaneie este código</p>
+                </div>
+
+                <div class="qr-container">
+                    <div class="qr-wrapper">
+                        <qrcode
+                            [qrdata]="statusConexao.qrCode"
+                            [width]="256"
+                            [errorCorrectionLevel]="'M'"
+                            [cssClass]="'qr-image'">
+                        </qrcode>
+                        <div class="qr-overlay" *ngIf="conectando">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="qr-instructions">
+                    <div class="instruction-step">
+                        <span class="step-number">1</span>
+                        <span>Abra o WhatsApp no seu celular</span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">2</span>
+                        <span>Toque em <strong>Mais opções</strong> ou <strong>Configurações</strong></span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">3</span>
+                        <span>Selecione <strong>Aparelhos conectados</strong></span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">4</span>
+                        <span>Toque em <strong>Conectar um aparelho</strong></span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">5</span>
+                        <span>Aponte seu telefone para esta tela para capturar o código</span>
+                    </div>
+                </div>
+
+                <button class="btn-secondary" (click)="atualizarQrCode()" [disabled]="conectando">
+                    <span class="material-icons">refresh</span>
+                    Atualizar QR Code
+                </button>
+            </div>
+        </section>
+
+        <!-- Configuração do Telefone da Empresa -->
+        <section class="config-section">
+            <div class="section-header">
+                <span class="material-icons">business</span>
+                <h2 class="section-title">Telefone da Empresa</h2>
+            </div>
+
+            <div class="phone-config">
+                <div class="info-box-small">
+                    <span class="material-icons">info</span>
+                    <p>Este é o número que seus clientes verão ao receberem mensagens. Certifique-se de incluir o código
+                        do país.</p>
+                </div>
+
+                <div class="phone-display" *ngIf="!editandoTelefone">
+                    <div class="phone-info">
+                        <span class="phone-label">Telefone atual:</span>
+                        <span class="phone-value">{{ telefoneEmpresa || 'Não configurado' }}</span>
+                    </div>
+                    <button class="btn-edit" (click)="iniciarEdicaoTelefone()">
+                        <span class="material-icons">edit</span>
+                        Editar
+                    </button>
+                </div>
+
+                <div class="phone-edit" *ngIf="editandoTelefone">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="label-text">Número de Telefone</span>
+                        </label>
+                        <span class="label-hint">Formato: +55 11 98765-4321</span>
+                        <input type="text" [(ngModel)]="telefoneEmpresa" (input)="formatarTelefone($event)"
+                            class="form-input" placeholder="+55 11 98765-4321" maxlength="20" />
+                    </div>
+
+                    <div class="edit-actions">
+                        <button class="btn-secondary" (click)="cancelarEdicaoTelefone()" [disabled]="salvandoTelefone">
+                            <span class="material-icons">close</span>
+                            Cancelar
+                        </button>
+                        <button class="btn-primary" (click)="salvarTelefone()"
+                            [disabled]="salvandoTelefone || !telefoneAlterado">
+                            <span class="material-icons" *ngIf="!salvandoTelefone">check</span>
+                            <span class="spinner-small" *ngIf="salvandoTelefone"></span>
+                            {{ salvandoTelefone ? 'Salvando...' : 'Salvar' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Informações e Ajuda -->
+        <section class="help-section">
+            <div class="section-header">
+                <span class="material-icons">help_outline</span>
+                <h2 class="section-title">Informações e Ajuda</h2>
+            </div>
+
+            <div class="help-cards">
+                <div class="help-card">
+                    <span class="material-icons">security</span>
+                    <h3>Segurança</h3>
+                    <p>Sua conexão é protegida com criptografia de ponta a ponta. Apenas você tem acesso às suas
+                        conversas.</p>
+                </div>
+
+                <div class="help-card">
+                    <span class="material-icons">devices</span>
+                    <h3>Multi-dispositivo</h3>
+                    <p>Você pode usar o WhatsApp em até 4 dispositivos conectados simultaneamente.</p>
+                </div>
+
+                <div class="help-card">
+                    <span class="material-icons">sync</span>
+                    <h3>Sincronização</h3>
+                    <p>Suas mensagens são sincronizadas automaticamente entre todos os dispositivos conectados.</p>
+                </div>
+
+                <div class="help-card">
+                    <span class="material-icons">support_agent</span>
+                    <h3>Suporte</h3>
+                    <p>Em caso de problemas com a conexão, entre em contato com nosso suporte técnico.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="carregando">
+        <div class="spinner"></div>
+        <h3>Carregando configurações...</h3>
+    </div>
+</main>

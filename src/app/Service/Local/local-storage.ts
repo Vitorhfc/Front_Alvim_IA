@@ -61,6 +61,31 @@ export class LocalStorageService {
     this.removeToken();
     this.removeUsuario();
   }
+
+  /**
+   * Obtém o ID da empresa do usuário logado
+   * Retorna null se não houver usuário logado ou empresa vinculada
+   */
+  getEmpresaId(): string | null {
+    const usuario = this.getUsuario();
+    if (!usuario) return null;
+
+    // Se o usuário tiver empresaId diretamente (pode ser adicionado no login)
+    return (usuario as any).empresaId || null;
+  }
+
+  /**
+   * Define o ID da empresa no storage
+   */
+  setEmpresaId(empresaId: string): void {
+    if (this.isBrowser()) {
+      const usuario = this.getUsuario();
+      if (usuario) {
+        (usuario as any).empresaId = empresaId;
+        this.setUsuario(usuario);
+      }
+    }
+  }
 }
 
 

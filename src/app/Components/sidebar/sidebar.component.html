@@ -1,10 +1,19 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.collapsed]="sidebarCollapsed$ | async">
   <!-- Logo -->
   <div class="sidebar-header">
     <div class="logo-container">
       <span class="material-icons logo-icon">chat_bubble</span>
       <span class="logo-text">AI Agent</span>
     </div>
+
+    <!-- Botão Toggle -->
+    <button
+      class="toggle-btn"
+      (click)="toggleSidebar()"
+      [title]="(sidebarCollapsed$ | async) ? 'Expandir menu' : 'Recolher menu'"
+    >
+      <span class="material-icons">{{ (sidebarCollapsed$ | async) ? 'chevron_right' : 'chevron_left' }}</span>
+    </button>
   </div>
 
   <!-- Menu Items -->

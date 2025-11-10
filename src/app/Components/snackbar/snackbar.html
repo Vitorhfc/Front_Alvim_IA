@@ -1,0 +1,20 @@
+<div class="snackbar-container">
+  <div
+    *ngFor="let message of messages"
+    class="snackbar"
+    [ngClass]="'snackbar-' + message.type"
+    [@slideIn]
+  >
+    <div class="snackbar-content">
+      <span class="material-icons snackbar-icon">{{ getIcon(message.type) }}</span>
+      <span class="snackbar-message">{{ message.message }}</span>
+    </div>
+    <button
+      class="snackbar-close"
+      (click)="removeMessage(message.id)"
+      aria-label="Fechar"
+    >
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+</div>

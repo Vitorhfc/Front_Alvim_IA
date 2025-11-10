@@ -1,10 +1,10 @@
 <div class="conversas-layout">
-  <app-sidebar></app-sidebar>
 
-  <main class="conversas-content">
+  <main class="conversas-content" [class.conversa-selecionada]="conversaSelecionada">
     <!-- Lista de Conversas -->
-    <aside class="conversas-list">
+    <aside class="conversas-list" [class.minimizada]="conversaSelecionada">
       <div class="conversas-list-header">
+        <h2 class="conversas-title">Conversas</h2>
         <div class="search-container">
           <span class="material-icons search-icon">search</span>
           <input
@@ -16,7 +16,27 @@
         </div>
       </div>
 
-      <div class="conversas-items" *ngIf="!loading">
+      <!-- Loading State -->
+      <div class="loading-list" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Carregando conversas...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-conversas" *ngIf="!loading && conversas.length === 0">
+        <span class="material-icons empty-icon">chat_bubble_outline</span>
+        <h3>Nenhum cliente encontrado</h3>
+        <p>Não há clientes cadastrados no momento</p>
+      </div>
+
+      <!-- Lista de Conversas -->
+      <div class="conversas-items" *ngIf="!loading && conversas.length > 0">
+        <!-- Empty State para busca sem resultados -->
+        <div class="empty-search" *ngIf="conversasFiltradas.length === 0">
+          <span class="material-icons">search_off</span>
+          <p>Nenhuma conversa encontrada</p>
+        </div>
+
         <div
           class="conversa-item"
           *ngFor="let conversa of conversasFiltradas"
@@ -45,11 +65,6 @@
           </div>
         </div>
       </div>
-
-      <div class="loading-list" *ngIf="loading">
-        <div class="spinner"></div>
-        <p>Carregando conversas...</p>
-      </div>
     </aside>
 
     <!-- Área de Chat -->
@@ -72,6 +87,13 @@
           </div>
         </div>
         <div class="chat-actions">
+          <button
+            class="icon-btn"
+            title="Ver detalhes do cliente"
+            (click)="abrirDetalhesCliente(conversaSelecionada)"
+          >
+            <span class="material-icons">person</span>
+          </button>
           <button class="icon-btn" title="Ligar">
             <span class="material-icons">call</span>
           </button>
@@ -122,17 +144,30 @@
           <span class="avatar-text">{{ conversaSelecionada.avatar }}</span>
         </div>
         <h3 class="cliente-nome">{{ conversaSelecionada.clienteNome }}</h3>
-        <p class="cliente-telefone">+55 11 99999-9999</p>
+        <p class="cliente-telefone">{{ conversaSelecionada.cliente.numero || 'Não informado' }}</p>
+
+        <button
+          class="btn-ver-detalhes"
+          (click)="abrirDetalhesCliente(conversaSelecionada)"
+        >
+          <span class="material-icons">open_in_new</span>
+          Ver Detalhes Completos
+        </button>
       </div>
 
       <div class="cliente-info-section">
-        <h4 class="section-title">Histórico</h4>
-        <p class="section-content">12 conversas anteriores</p>
+        <h4 class="section-title">Email</h4>
+        <p class="section-content">{{ conversaSelecionada.cliente.email || 'Não informado' }}</p>
+      </div>
+
+      <div class="cliente-info-section">
+        <h4 class="section-title">CPF</h4>
+        <p class="section-content">{{ conversaSelecionada.cliente.cpf || 'Não informado' }}</p>
       </div>
 
       <div class="cliente-info-section">
         <h4 class="section-title">Última interação</h4>
-        <p class="section-content">Hoje às {{ conversaSelecionada.horario }}</p>
+        <p class="section-content">{{ conversaSelecionada.horario }}</p>
       </div>
 
       <div class="cliente-info-section">
@@ -141,6 +176,11 @@
           <span class="status-dot"></span>
           {{ conversaSelecionada.status === 'online' ? 'Ativo' : 'Inativo' }}
         </div>
+      </div>
+
+      <div class="cliente-info-section">
+        <h4 class="section-title">Total de Mensagens</h4>
+        <p class="section-content">{{ conversaSelecionada.cliente.totalMensagens || 0 }}</p>
       </div>
     </aside>
 

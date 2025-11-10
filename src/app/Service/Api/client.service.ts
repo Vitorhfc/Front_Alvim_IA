@@ -230,15 +230,27 @@ export class ClientService extends BaseApiService {
   /**
    * Busca configuração de IA da empresa
    */
-  async buscarConfiguracaoIa(): Promise<ConfiguracaoIA> {
-    return this.get<ConfiguracaoIA>('/ConfiguracaoIa');
+  async buscarConfiguracaoIa(): Promise<ConfiguracaoIA | null> {
+    try {
+      return await this.get<ConfiguracaoIA>('/ConfiguracaoIA');
+    } catch (error) {
+      console.log('Nenhuma configuração de IA encontrada');
+      return null;
+    }
+  }
+
+  /**
+   * Cria configuração de IA da empresa
+   */
+  async criarConfiguracaoIa(config: Partial<ConfiguracaoIA>): Promise<ConfiguracaoIA> {
+    return this.post<Partial<ConfiguracaoIA>, ConfiguracaoIA>('/ConfiguracaoIA', config);
   }
 
   /**
    * Atualiza configuração de IA
    */
-  async atualizarConfiguracaoIa(config: Partial<ConfiguracaoIA>): Promise<ConfiguracaoIA> {
-    return this.put<Partial<ConfiguracaoIA>, ConfiguracaoIA>('/ConfiguracaoIa', config);
+  async atualizarConfiguracaoIa(id: string, config: Partial<ConfiguracaoIA>): Promise<ConfiguracaoIA> {
+    return this.put<Partial<ConfiguracaoIA>, ConfiguracaoIA>(`/ConfiguracaoIA/${id}`, config);
   }
 
   /**

@@ -1,0 +1,351 @@
+<div class="cliente-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="cliente-content">
+    <!-- Header -->
+    <header class="cliente-header">
+      <button class="btn-voltar" (click)="voltarParaConversas()" [disabled]="removendo">
+        <span class="material-icons">arrow_back</span>
+        Voltar para Conversas
+      </button>
+
+      <div class="header-actions" *ngIf="!loading && cliente">
+        <button 
+          class="btn-editar" 
+          *ngIf="!editMode" 
+          (click)="habilitarEdicao()"
+          [disabled]="removendo"
+        >
+          <span class="material-icons">edit</span>
+          Editar
+        </button>
+        <button 
+          class="btn-remover" 
+          (click)="removerCliente()"
+          [disabled]="removendo || editMode"
+        >
+          <span class="material-icons" *ngIf="!removendo">delete</span>
+          <span class="spinner-small" *ngIf="removendo"></span>
+          {{ removendo ? 'Removendo...' : 'Remover' }}
+        </button>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Carregando dados do cliente...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-container" *ngIf="error && !loading && !cliente">
+      <span class="material-icons error-icon">error_outline</span>
+      <h3>Erro ao carregar cliente</h3>
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="voltarParaConversas()">
+        Voltar para Conversas
+      </button>
+    </div>
+
+    <!-- Cliente Info -->
+    <div class="cliente-info-container" *ngIf="cliente && !loading">
+      <!-- Avatar e Info Principal -->
+      <section class="cliente-card">
+        <div class="cliente-avatar-section">
+          <div class="cliente-avatar-large">
+            <span class="avatar-text">{{ getInitials(cliente.nome) }}</span>
+          </div>
+          <div class="cliente-info-principal">
+            <h1 class="cliente-nome">{{ cliente.nome }}</h1>
+            <p class="cliente-telefone">
+              <span class="material-icons">phone</span>
+              {{ formatarTelefone(cliente.numero) }}
+            </p>
+            <div class="status-badge" [ngClass]="getStatusClass(cliente.statusConversa)">
+              <span class="status-dot"></span>
+              {{ getStatusLabel(cliente.statusConversa) }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Estatísticas Rápidas -->
+        <div class="cliente-stats">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <span class="material-icons">message</span>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ cliente.totalMensagens || 0 }}</span>
+              <span class="stat-label">Mensagens</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <span class="material-icons">schedule</span>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ formatarData(cliente.dtUltimaInteracao) }}</span>
+              <span class="stat-label">Última Interação</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <span class="material-icons">event</span>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ formatarData(cliente.dtPrimeiroContato) }}</span>
+              <span class="stat-label">Primeiro Contato</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Alert de erro durante operações -->
+      <div class="alert alert-error" *ngIf="error && cliente">
+        <span class="material-icons">error</span>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Tabs -->
+      <section class="tabs-section">
+        <div class="tabs-header">
+          <button
+            class="tab-btn"
+            [class.active]="activeTab === 'dados'"
+            (click)="selecionarTab('dados')"
+            [disabled]="editMode"
+          >
+            <span class="material-icons">person</span>
+            Dados do Cliente
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="activeTab === 'mensagens'"
+            (click)="selecionarTab('mensagens')"
+            [disabled]="editMode"
+          >
+            <span class="material-icons">chat</span>
+            Mensagens
+            <span class="badge" *ngIf="cliente.totalMensagens">{{ cliente.totalMensagens }}</span>
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="activeTab === 'historico'"
+            (click)="selecionarTab('historico')"
+            [disabled]="editMode"
+          >
+            <span class="material-icons">history</span>
+            Histórico
+          </button>
+        </div>
+
+        <div class="tabs-content">
+          <!-- Tab: Dados do Cliente -->
+          <div class="tab-panel" *ngIf="activeTab === 'dados'">
+            <div class="form-section">
+              <h3 class="section-title">
+                <span class="material-icons">person</span>
+                Informações Pessoais
+              </h3>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Nome Completo *</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    [(ngModel)]="formData.nome"
+                    [disabled]="!editMode"
+                    placeholder="Nome do cliente"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">CPF</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    [(ngModel)]="formData.cpf"
+                    [disabled]="!editMode"
+                    placeholder="000.000.000-00"
+                  />
+                  <small class="form-hint" *ngIf="!editMode && cliente.cpf">
+                    {{ formatarCPF(cliente.cpf) }}
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-input"
+                    [(ngModel)]="formData.email"
+                    [disabled]="!editMode"
+                    placeholder="email@exemplo.com"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Telefone</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    [(ngModel)]="formData.numero"
+                    [disabled]="!editMode"
+                    placeholder="(00) 00000-0000"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="section-title">
+                <span class="material-icons">settings</span>
+                Informações do Sistema
+              </h3>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">WhatsApp (Número Interno)</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    [value]="cliente.numeroInterno || 'Não informado'"
+                    disabled
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Número WAHA</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    [value]="cliente.numeroTelefoneWaha || 'Não informado'"
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="section-title">
+                <span class="material-icons">chat_bubble</span>
+                Contexto da Conversa
+              </h3>
+
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label class="form-label">Intenção Identificada</label>
+                  <div class="info-box">
+                    {{ (cliente.contexto && cliente.contexto.intencaoIdentificada) || 'Não identificada' }}
+                  </div>
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="form-label">Próxima Ação Sugerida</label>
+                  <div class="info-box">
+                    {{ (cliente.contexto && cliente.contexto.proximaAcaoSugerida) || 'Nenhuma' }}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Data Primeiro Contato</label>
+                  <div class="info-box">
+                    <span class="material-icons">event</span>
+                    {{ formatarData(cliente.dtPrimeiroContato) }}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Data Última Interação</label>
+                  <div class="info-box">
+                    <span class="material-icons">schedule</span>
+                    {{ formatarData(cliente.dtUltimaInteracao) }}
+                  </div>
+                </div>
+
+                <div class="form-group" *ngIf="cliente.dtFinalizacaoConversa">
+                  <label class="form-label">Data Finalização</label>
+                  <div class="info-box">
+                    <span class="material-icons">done_all</span>
+                    {{ formatarData(cliente.dtFinalizacaoConversa) }}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Total de Mensagens</label>
+                  <div class="info-box stat-highlight">
+                    <span class="material-icons">message</span>
+                    <strong>{{ cliente.totalMensagens || 0 }}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ações de Edição -->
+            <div class="form-actions" *ngIf="editMode">
+              <button 
+                class="btn-cancelar" 
+                (click)="cancelarEdicao()"
+                [disabled]="salvando"
+              >
+                <span class="material-icons">close</span>
+                Cancelar
+              </button>
+              <button 
+                class="btn-salvar" 
+                (click)="salvarAlteracoes()"
+                [disabled]="salvando"
+              >
+                <span class="material-icons" *ngIf="!salvando">save</span>
+                <span class="spinner-small" *ngIf="salvando"></span>
+                {{ salvando ? 'Salvando...' : 'Salvar Alterações' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab: Mensagens -->
+          <div class="tab-panel" *ngIf="activeTab === 'mensagens'">
+            <!-- Loading Mensagens -->
+            <div class="loading-mensagens" *ngIf="loadingMensagens">
+              <div class="spinner"></div>
+              <p>Carregando mensagens...</p>
+            </div>
+
+            <!-- Lista de Mensagens -->
+            <div class="mensagens-container" *ngIf="!loadingMensagens">
+              <div class="mensagem-item" *ngFor="let mensagem of mensagens; trackBy: trackByMensagemId">
+                <div class="mensagem-header">
+                  <div class="mensagem-remetente">
+                    <span class="material-icons">account_circle</span>
+                    {{ mensagem.remetenteId }}
+                  </div>
+                  <span class="mensagem-horario">{{ formatarData(mensagem.dtEnvio) }}</span>
+                </div>
+                <p class="mensagem-texto">{{ mensagem.texto }}</p>
+              </div>
+
+              <!-- Empty State -->
+              <div class="empty-state" *ngIf="mensagens.length === 0">
+                <span class="material-icons">chat_bubble_outline</span>
+                <h3>Nenhuma mensagem encontrada</h3>
+                <p>Ainda não há mensagens nesta conversa</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Histórico -->
+          <div class="tab-panel" *ngIf="activeTab === 'historico'">
+            <div class="historico-container">
+              <div class="empty-state">
+                <span class="material-icons">history</span>
+                <h3>Histórico em desenvolvimento</h3>
+                <p>Esta funcionalidade estará disponível em breve</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

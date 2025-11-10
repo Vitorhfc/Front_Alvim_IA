@@ -7,12 +7,14 @@ import { CadastroEmpresaComponent } from './Pages/auth/cadastro-empresa/cadastro
 import { HomeComponent } from './Pages/home.component/home.component';
 import { DashboardComponent } from './Pages/dashboard/dashboard.component';
 import { ConversasComponent } from './Pages/conversas/conversas.component';
+import { ClienteComponent } from './Pages/cliente/cliente';
 import { AnalisesComponent } from './Pages/analises/analises.component';
 import { TemplatesComponent } from './Pages/templates/templates.component';
 import { BaseConhecimentoComponent } from './Pages/base-conhecimento/base-conhecimento.component';
 import { ConfiguracoesComponent } from './Pages/configuracoes/configuracoes.component';
 import { FuncionariosComponent } from './Pages/funcionarios/funcionarios.component';
 import { AgendamentosComponent } from './Pages/agendamentos/agendamentos.component';
+import { WhatsappConfigComponent } from './Pages/whatsapp-config/whatsapp-config';
 
 export const routes: Routes = [
     // ==================== ROTAS PÚBLICAS ====================
@@ -54,6 +56,12 @@ export const routes: Routes = [
         canActivate: [logadoGuard],
         title: 'Conversas - AI Agent'
     },
+    {
+        path: 'cliente/:id',
+        component: ClienteComponent,
+        canActivate: [logadoGuard],
+        title: 'Detalhes do Cliente - AI Agent'
+    },
     // ==================== ROTAS TEMPORARIAMENTE DESABILITADAS ====================
     // {
     //     path: 'analises',
@@ -79,6 +87,12 @@ export const routes: Routes = [
         component: ConfiguracoesComponent,
         canActivate: [logadoGuard],
         title: 'Configurações - AI Agent'
+    },
+    {
+        path: 'whatsapp-config',
+        component: WhatsappConfigComponent,
+        canActivate: [logadoGuard],
+        title: 'Configuração WhatsApp - AI Agent'
     },
     // ==================== ROTAS TEMPORARIAMENTE DESABILITADAS ====================
     // {

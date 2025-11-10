@@ -24,6 +24,7 @@ export * from './email.service';
 export * from './analises.service';
 export * from './mensagens.service';
 export * from './templates.service';
+export * from './waha.service';
 
 // Types e Interfaces
 export * from './api-types';

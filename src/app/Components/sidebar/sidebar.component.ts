@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { LocalStorageService } from '../../Service/Local/local-storage';
 import { AuthService } from '../../Service/Api/auth.service';
+import { LayoutService } from '../../Service/layout';
+import { Observable } from 'rxjs';
 
 interface MenuItem {
   icon: string;
@@ -24,6 +26,9 @@ export class SidebarComponent implements OnInit {
   usuario: any = null;
   isAdministrador: boolean = false;
 
+  // Controle de colapso
+  sidebarCollapsed$: Observable<boolean>;
+
   menuItems: MenuItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
     { icon: 'chat', label: 'Conversas', route: '/conversas' },
@@ -32,14 +37,18 @@ export class SidebarComponent implements OnInit {
     { icon: 'analytics', label: 'Análises', route: '/analises', disabled: true }, // Desabilitado temporariamente
     { icon: 'description', label: 'Templates', route: '/templates', disabled: true }, // Desabilitado temporariamente
     { icon: 'menu_book', label: 'Base de Conhecimento', route: '/base-conhecimento' },
-    { icon: 'settings', label: 'Configurações', route: '/configuracoes' }
+    { icon: 'phone', label: 'WhatsApp', route: '/whatsapp-config' },
+    { icon: 'settings', label: 'Configurações', route: '/configuracoes', disabled: true} // Desabilitado temporariamente
   ];
 
   constructor(
     private router: Router,
     private localStorageService: LocalStorageService,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private layoutService: LayoutService
+  ) {
+    this.sidebarCollapsed$ = this.layoutService.sidebarCollapsed$;
+  }
 
   ngOnInit(): void {
     this.carregarDadosUsuario();
@@ -64,7 +73,15 @@ export class SidebarComponent implements OnInit {
 
   // ==================== TEMA ====================
 
+  private isBrowser(): boolean {
+    return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  }
+
   carregarTemaPreferido(): void {
+    if (!this.isBrowser()) {
+      this.isDarkMode = false;
+      return;
+    }
     const tema = localStorage.getItem('tema_preferido');
     this.isDarkMode = tema === 'dark';
     this.aplicarTema();
@@ -72,11 +89,16 @@ export class SidebarComponent implements OnInit {
 
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;
-    localStorage.setItem('tema_preferido', this.isDarkMode ? 'dark' : 'light');
+    if (this.isBrowser()) {
+      localStorage.setItem('tema_preferido', this.isDarkMode ? 'dark' : 'light');
+    }
     this.aplicarTema();
   }
 
   aplicarTema(): void {
+    if (!this.isBrowser()) {
+      return;
+    }
     if (this.isDarkMode) {
       document.documentElement.classList.add('dark-theme');
     } else {
@@ -101,6 +123,10 @@ export class SidebarComponent implements OnInit {
   }
 
   // ==================== NAVEGAÇÃO ====================
+
+  toggleSidebar(): void {
+    this.layoutService.toggleSidebarCollapse();
+  }
 
   logout(): void {
     this.authService.logout();

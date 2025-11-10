@@ -30,3 +30,14 @@ export class SpinnerService {
     return this.visibilitySubject.value;
   }
 }
+
+
+export function ShowSpinner(): void {
+  var spinner = new SpinnerService();
+  spinner.show();
+}
+
+export function hideSpinner(): void {
+  var spinner = new SpinnerService();
+  spinner.hidden();
+}
