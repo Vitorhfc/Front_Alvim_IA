@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { SidebarComponent } from '../../Components/sidebar/sidebar.component';
 import { ClientService } from '../../Service/Api/client.service';
 import { SnackbarService } from '../../Service/snackbar';
 import { Cliente, StatusConversa } from '../../Models/Entidades/Client/Cliente';
@@ -30,7 +29,7 @@ interface Mensagem {
 @Component({
   selector: 'app-conversas',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './conversas.component.html',
   styleUrls: ['./conversas.component.scss']
 })

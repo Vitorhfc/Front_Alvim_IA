@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from '../../Components/sidebar/sidebar.component';
 import { WahaService } from '../../Service/Api/waha.service';
 import { SnackbarService } from '../../Service/snackbar';
 import { hideSpinner, ShowSpinner } from '../../Service/Local/spinner';
@@ -21,7 +20,7 @@ interface StatusConexao {
 @Component({
   selector: 'app-whatsapp-config',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, QRCodeComponent],
+  imports: [CommonModule, FormsModule, QRCodeComponent],
   templateUrl: './whatsapp-config.html',
   styleUrls: ['./whatsapp-config.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

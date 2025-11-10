@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from '../../Components/sidebar/sidebar.component';
 import { ClientService } from '../../Service/Api/client.service';
 import { ConfiguracaoIA } from '../../Models/Entidades/Client/ConfiguracaoIa';
 import { SnackbarService } from '../../Service/snackbar';
@@ -10,7 +9,7 @@ import { hideSpinner, ShowSpinner, SpinnerService } from '../../Service/Local/sp
 @Component({
   selector: 'app-base-conhecimento',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './base-conhecimento.component.html',
   styleUrls: ['./base-conhecimento.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
