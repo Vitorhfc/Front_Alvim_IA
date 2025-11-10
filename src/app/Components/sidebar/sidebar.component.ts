@@ -88,6 +88,7 @@ export class SidebarComponent implements OnInit {
   }
 
   toggleTheme(): void {
+    console.log(this.usuario);
     this.isDarkMode = !this.isDarkMode;
     if (this.isBrowser()) {
       localStorage.setItem('tema_preferido', this.isDarkMode ? 'dark' : 'light');

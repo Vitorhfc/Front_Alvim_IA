@@ -7,7 +7,7 @@ type TabType = 'sentimentos' | 'heatmap' | 'resolucao' | 'palavras-chave';
 @Component({
   selector: 'app-analises',
   standalone: true,
-  imports: [CommonModule, SidebarComponent],
+  imports: [CommonModule],
   templateUrl: './analises.component.html',
   styleUrls: ['./analises.component.scss']
 })

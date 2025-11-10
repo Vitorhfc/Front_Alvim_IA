@@ -30,7 +30,7 @@ body {
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
   // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
+  background-color: var(--bg-gradient);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
 
@@ -93,4 +93,32 @@ body {
   }
 
   scrollbar-color: hsl(var(--accent)) transparent;
+}
+
+// ==================== NGX-CHARTS STYLES ====================
+
+// Customizações globais para os gráficos
+.ngx-charts {
+  text {
+    fill: var(--text-primary) !important;
+  }
+
+  .gridline-path {
+    stroke: var(--border-color) !important;
+  }
+
+  .tick {
+    text {
+      fill: var(--text-secondary) !important;
+    }
+  }
+
+  .legend-label {
+    fill: var(--text-primary) !important;
+  }
+
+  .tooltip-anchor {
+    fill: var(--card-bg) !important;
+    stroke: var(--border-color) !important;
+  }
 }

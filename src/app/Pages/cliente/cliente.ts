@@ -19,7 +19,7 @@ interface MensagemView {
 @Component({
   selector: 'app-cliente',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './cliente.html',
   styleUrl: './cliente.scss',
 })

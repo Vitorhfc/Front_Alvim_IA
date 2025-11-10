@@ -33,7 +33,7 @@ interface AgendamentoForm {
 @Component({
   selector: 'app-agendamentos',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './agendamentos.component.html',
   styleUrls: ['./agendamentos.component.scss']
 })

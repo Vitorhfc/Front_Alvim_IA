@@ -8,7 +8,7 @@ type TabType = 'geral' | 'ia' | 'integrações' | 'notificações' | 'segurança
 @Component({
   selector: 'app-configuracoes',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './configuracoes.component.html',
   styleUrls: ['./configuracoes.component.scss']
 })

@@ -16,7 +16,7 @@ interface Template {
 @Component({
   selector: 'app-templates',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './templates.component.html',
   styleUrls: ['./templates.component.scss']
 })

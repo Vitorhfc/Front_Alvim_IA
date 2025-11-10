@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../Environment/Environment';
 import { LocalStorageService } from '../Local/local-storage';
 import { ApiResponse } from '../../Models/Objetos/resposta.model';
-import { DashboardResponse, AdminDashboardResponse } from '../../Models/Objetos/dashboard.model';
+import { DashboardResponse } from '../../Models/Objetos/dashboard.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class DashboardService {
   constructor(
     private http: HttpClient,
     private localStorageService: LocalStorageService
-  ) {}
+  ) { }
 
   // ==================== HEADERS ====================
 
@@ -34,51 +34,34 @@ export class DashboardService {
     try {
       const headers = this.getHeaders();
       const response = await firstValueFrom(
-        this.http.get<ApiResponse<DashboardResponse>>(
-          `${this.CLIENT_API}/Dashboard`,
-          { headers }
-        )
+        this.http.get<DashboardResponse>(`${this.CLIENT_API}/Dashboard`, { headers })
       );
 
-      if (response.sucesso) {
-        return response.data;
+      return this.normalizarDados(response);
+    } catch (error) {
+      console.error('Erro ao obter dados do dashboard:', error);
+
+      if (error instanceof HttpErrorResponse) {
+        throw new Error(`Erro na API: ${error.status} - ${error.message}`);
       }
 
-      throw new Error(response.mensagem || 'Erro ao obter dados do dashboard');
-    } catch (error: any) {
-      console.error('Erro ao obter dados do dashboard:', error);
-      throw new Error(
-        error.error?.mensagem ||
-        error.message ||
-        'Erro ao carregar dashboard'
-      );
+      throw new Error('Erro ao conectar com o servidor');
     }
   }
 
-  // ==================== DASHBOARD ADMIN ====================
-
-  async obterDadosAdminDashboard(): Promise<AdminDashboardResponse> {
-    try {
-      const headers = this.getHeaders();
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<AdminDashboardResponse>>(
-          `${this.ADMIN_API}/Dashboard/Admin`,
-          { headers }
-        )
-      );
-
-      if (response.sucesso) {
-        return response.data;
-      }
-
-      throw new Error(response.mensagem || 'Erro ao obter dados do dashboard administrativo');
-    } catch (error: any) {
-      console.error('Erro ao obter dados do admin dashboard:', error);
-      throw new Error(
-        error.error?.mensagem ||
-        error.message ||
-        'Erro ao carregar dashboard administrativo'
-      );
-    }
+  private normalizarDados(data: any): DashboardResponse {
+    return {
+      metrics: data.metrics || [],
+      sentimentosData: data.sentimentosData || { positivo: 0, neutro: 0, negativo: 0 },
+      volumeMensagensData: (data.volumeMensagensData || []).map((item: any) => ({
+        name: item.name || '',
+        value: item.value || 0
+      })),
+      categoriasData: (data.categoriasData || []).map((item: any) => ({
+        name: item.name || '',
+        value: item.value || 0
+      })),
+      conversasRecentes: data.conversasRecentes || []
+    };
   }
 }

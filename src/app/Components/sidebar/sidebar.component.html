@@ -1,30 +1,22 @@
 <aside class="sidebar" [class.collapsed]="sidebarCollapsed$ | async">
   <!-- Logo -->
-  <div class="sidebar-header">
+  <div class="sidebar-header" (click)="toggleSidebar()">
     <div class="logo-container">
       <span class="material-icons logo-icon">chat_bubble</span>
       <span class="logo-text">AI Agent</span>
     </div>
 
     <!-- Botão Toggle -->
-    <button
-      class="toggle-btn"
-      (click)="toggleSidebar()"
-      [title]="(sidebarCollapsed$ | async) ? 'Expandir menu' : 'Recolher menu'"
-    >
+    <button class="toggle-btn" *ngIf="!(sidebarCollapsed$ | async)"
+      [title]="(sidebarCollapsed$ | async) ? 'Expandir menu' : 'Recolher menu'">
       <span class="material-icons">{{ (sidebarCollapsed$ | async) ? 'chevron_right' : 'chevron_left' }}</span>
     </button>
   </div>
 
   <!-- Menu Items -->
   <nav class="sidebar-nav">
-    <a
-      *ngFor="let item of getVisibleMenuItems()"
-      [routerLink]="item.route"
-      routerLinkActive="active"
-      class="nav-item"
-      [title]="item.label"
-    >
+    <a *ngFor="let item of getVisibleMenuItems()" [routerLink]="item.route" routerLinkActive="active" class="nav-item"
+      [title]="item.label">
       <span class="material-icons nav-icon">{{ item.icon }}</span>
       <span class="nav-label">{{ item.label }}</span>
     </a>
@@ -32,7 +24,7 @@
 
   <!-- User Footer -->
   <div class="sidebar-footer">
-    <div class="user-info">
+    <div class="user-info"  *ngIf="usuario.usuarioId != '690e30ce82088f66afeb8643'">
       <div class="avatar">{{ getInitials() }}</div>
       <div class="user-details">
         <span class="user-name">{{ usuario?.nome || 'Usuário' }}</span>
@@ -41,19 +33,11 @@
     </div>
 
     <div class="footer-actions">
-      <button
-        class="icon-btn theme-toggle"
-        (click)="toggleTheme()"
-        [title]="isDarkMode ? 'Modo Claro' : 'Modo Escuro'"
-      >
+      <button class="icon-btn theme-toggle" (click)="toggleTheme()" [title]="isDarkMode ? 'Modo Claro' : 'Modo Escuro'">
         <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
       </button>
 
-      <button
-        class="icon-btn logout-btn"
-        (click)="logout()"
-        title="Sair"
-      >
+      <button class="icon-btn logout-btn" (click)="logout()" title="Sair">
         <span class="material-icons">logout</span>
       </button>
     </div>

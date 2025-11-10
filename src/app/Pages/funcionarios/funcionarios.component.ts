@@ -9,7 +9,7 @@ import { Funcionario, HorarioTrabalho, TipoAusencia } from '../../Models/Entidad
 @Component({
   selector: 'app-funcionarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './funcionarios.component.html',
   styleUrls: ['./funcionarios.component.scss']
 })
