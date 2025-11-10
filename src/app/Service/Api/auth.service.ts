@@ -30,18 +30,63 @@ export class AuthService {
    * - Retorna informações do usuário e destino de envio do token
    */
   async login(model: LoginModel): Promise<LoginResponseModel> {
-    const response = await firstValueFrom(
-      this.http.post<ApiResponse<LoginResponseModel>>(
-        `${this.CLIENT_API}/Autenticacao/login`,
-        model
-      )
-    );
+    try {
+      const response = await firstValueFrom(
+        this.http.post<ApiResponse<LoginResponseModel>>(
+          `${this.CLIENT_API}/Autenticacao/login`,
+          model
+        )
+      );
 
-    if (!response.sucesso)
-      throw new Error(response.error || 'Erro ao realizar login');
+      if (!response.sucesso)
+        throw new Error(response.error || 'Erro ao realizar login');
 
+      return response.data;
+    } catch (error: any) {
+      // Log detalhado do erro para debugging
+      console.error('Erro detalhado no login:', {
+        status: error.status,
+        statusText: error.statusText,
+        errorResponse: error.error,
+        message: error.message,
+        url: error.url
+      });
 
-    return response.data;
+      // Tentar extrair mensagem mais específica do erro
+      let mensagemErro =
+        error.error?.mensagem ||
+        error.error?.message ||
+        error.error?.error ||
+        (typeof error.error === 'string' ? error.error : null);
+
+      // Se não houver mensagem específica da API, usar mensagens customizadas baseadas no status HTTP
+      if (!mensagemErro) {
+        switch (error.status) {
+          case 400:
+            mensagemErro = 'Email ou senha inválidos. Verifique suas credenciais e tente novamente.';
+            break;
+          case 401:
+            mensagemErro = 'Credenciais inválidas. Por favor, verifique seu email e senha.';
+            break;
+          case 404:
+            mensagemErro = 'Serviço de autenticação não encontrado. Entre em contato com o suporte.';
+            break;
+          case 500:
+            mensagemErro = 'Erro no servidor. Por favor, tente novamente em alguns instantes.';
+            break;
+          case 503:
+            mensagemErro = 'Serviço temporariamente indisponível. Tente novamente em breve.';
+            break;
+          case 0:
+            mensagemErro = 'Erro de conexão. Verifique sua internet e tente novamente.';
+            break;
+          default:
+            mensagemErro = 'Erro ao realizar login. Por favor, tente novamente.';
+        }
+      }
+
+      throw new Error(mensagemErro);
+    }
   }
 
   /**

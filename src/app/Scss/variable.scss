@@ -20,7 +20,27 @@
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 221 83% 53%;
-    --radius: 0.75rem;
+    --radius: 0.5rem;
+
+    // ==================== TAMANHOS DE FONTE ====================
+    --font-size-xs: 0.625rem;    // 10px
+    --font-size-sm: 0.75rem;     // 12px
+    --font-size-base: 0.813rem;  // 13px
+    --font-size-md: 0.875rem;    // 14px
+    --font-size-lg: 0.938rem;    // 15px
+    --font-size-xl: 1rem;        // 16px
+    --font-size-2xl: 1.125rem;   // 18px
+    --font-size-3xl: 1.25rem;    // 20px
+    --font-size-4xl: 1.5rem;     // 24px
+    --font-size-5xl: 1.875rem;   // 30px
+
+    // ==================== ESPAÇAMENTOS ====================
+    --spacing-xs: 0.25rem;   // 4px
+    --spacing-sm: 0.5rem;    // 8px
+    --spacing-md: 0.75rem;   // 12px
+    --spacing-lg: 1rem;      // 16px
+    --spacing-xl: 1.5rem;    // 24px
+    --spacing-2xl: 2rem;     // 32px
 }
 
 .dark {
@@ -76,6 +96,8 @@ body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: var(--font-size-base);
+    line-height: 1.5;
 }
 
 // ==================== TEMA DINÂMICO ====================
@@ -140,4 +162,60 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+// ==================== CLASSES DE TIPOGRAFIA ====================
+
+h1, .h1 { font-size: var(--font-size-4xl); font-weight: 700; line-height: 1.2; }
+h2, .h2 { font-size: var(--font-size-3xl); font-weight: 600; line-height: 1.3; }
+h3, .h3 { font-size: var(--font-size-2xl); font-weight: 600; line-height: 1.3; }
+h4, .h4 { font-size: var(--font-size-xl); font-weight: 600; line-height: 1.4; }
+h5, .h5 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; }
+h6, .h6 { font-size: var(--font-size-md); font-weight: 600; line-height: 1.4; }
+
+p { font-size: var(--font-size-base); line-height: 1.6; margin-bottom: 0.75rem; }
+
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-md { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+.text-5xl { font-size: var(--font-size-5xl); }
+
+// ==================== AJUSTES PARA INPUTS E BOTÕES ====================
+
+button, input, select, textarea {
+    font-size: var(--font-size-base);
+}
+
+label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+// ==================== ANGULAR MATERIAL OVERRIDES ====================
+
+.mat-mdc-button, .mat-mdc-raised-button, .mat-mdc-outlined-button {
+    font-size: var(--font-size-sm) !important;
+    padding: 0.5rem 1rem !important;
+}
+
+.mat-mdc-form-field {
+    font-size: var(--font-size-base) !important;
+}
+
+.mat-mdc-card-title {
+    font-size: var(--font-size-xl) !important;
+}
+
+.mat-mdc-card-subtitle {
+    font-size: var(--font-size-sm) !important;
+}
+
+.mat-mdc-card-content {
+    font-size: var(--font-size-base) !important;
 }

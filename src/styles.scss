@@ -5,8 +5,11 @@
 // custom components at https://material.angular.dev/guide/theming
 @use "@angular/material" as mat;
 @import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap");
+@import "./app/Scss/variable.scss";
 
 html {
+  font-size: 14px; // Reduz o tamanho base de 16px para 14px (87.5%)
+
   @include mat.theme(
     (
       color: (
@@ -21,6 +24,7 @@ html {
 
 body {
   font-family: "Comfortaa", sans-serif;
+  font-size: 0.875rem; // 14px base (equivalente a 14px no html de 16px)
 
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
@@ -32,7 +36,6 @@ body {
   // variables at https://material.angular.dev/guide/system-variables
   background-color: var(--bg-gradient);
   color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
 
   // Reset the user agent margin.
   margin: 0;
@@ -51,11 +54,7 @@ body {
 .FonteRoboto {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-body {
-  margin: 0;
-  // font-family: Roboto, "Helvetica Neue", sans-serif;
-  font-family: "Comfortaa", sans-serif;
-}
+// Removido duplicado - definição de body já existe acima
 
 ::-webkit-scrollbar {
   width: 6px;
@@ -101,6 +100,7 @@ body {
 .ngx-charts {
   text {
     fill: var(--text-primary) !important;
+    font-size: var(--font-size-xs) !important;
   }
 
   .gridline-path {
@@ -110,15 +110,181 @@ body {
   .tick {
     text {
       fill: var(--text-secondary) !important;
+      font-size: var(--font-size-xs) !important;
     }
   }
 
   .legend-label {
     fill: var(--text-primary) !important;
+    font-size: var(--font-size-sm) !important;
   }
 
   .tooltip-anchor {
     fill: var(--card-bg) !important;
     stroke: var(--border-color) !important;
   }
+
+  .advanced-pie-legend {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// ==================== AJUSTES GLOBAIS DE TAMANHO ====================
+
+// Reduz ícones do Angular Material
+.mat-icon {
+  font-size: 1.25rem !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+}
+
+// Ajusta tamanhos de cards
+.mat-mdc-card {
+  padding: 1rem !important;
+}
+
+// Ajusta tabelas
+table {
+  font-size: var(--font-size-sm);
+
+  th {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    padding: 0.5rem !important;
+  }
+
+  td {
+    font-size: var(--font-size-sm);
+    padding: 0.5rem !important;
+  }
+}
+
+// Ajusta tooltips
+.mat-mdc-tooltip {
+  font-size: var(--font-size-xs) !important;
+}
+
+// Ajusta snackbars
+.mat-mdc-snack-bar-container {
+  font-size: var(--font-size-sm) !important;
+}
+
+// Ajusta dialogs
+.mat-mdc-dialog-title {
+  font-size: var(--font-size-xl) !important;
+}
+
+.mat-mdc-dialog-content {
+  font-size: var(--font-size-base) !important;
+}
+
+// Ajusta menus
+.mat-mdc-menu-content {
+  font-size: var(--font-size-sm) !important;
+}
+
+.mat-mdc-menu-item {
+  font-size: var(--font-size-sm) !important;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+}
+
+// Ajusta chips
+.mat-mdc-chip {
+  font-size: var(--font-size-xs) !important;
+  min-height: 1.75rem !important;
+}
+
+// Ajusta badges
+.mat-badge-content {
+  font-size: var(--font-size-xs) !important;
+}
+
+// Ajusta listas
+.mat-mdc-list-item {
+  font-size: var(--font-size-sm) !important;
+}
+
+// ==================== AJUSTES DE FORMULÁRIOS ====================
+
+// Form fields
+.mat-mdc-form-field {
+  .mat-mdc-form-field-label {
+    font-size: var(--font-size-sm) !important;
+  }
+
+  .mat-mdc-input-element {
+    font-size: var(--font-size-base) !important;
+  }
+
+  .mat-mdc-form-field-hint,
+  .mat-mdc-form-field-error {
+    font-size: var(--font-size-xs) !important;
+  }
+}
+
+// Select
+.mat-mdc-select {
+  font-size: var(--font-size-base) !important;
+
+  .mat-mdc-select-value {
+    font-size: var(--font-size-base) !important;
+  }
+}
+
+.mat-mdc-option {
+  font-size: var(--font-size-sm) !important;
+  min-height: 2.5rem !important;
+  height: auto !important;
+}
+
+// Checkbox e Radio
+.mat-mdc-checkbox,
+.mat-mdc-radio-button {
+  font-size: var(--font-size-sm) !important;
+
+  .mat-mdc-checkbox-label,
+  .mat-mdc-radio-label-content {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// Slide toggle
+.mat-mdc-slide-toggle {
+  .mat-mdc-slide-toggle-label {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// Datepicker
+.mat-datepicker-content {
+  font-size: var(--font-size-sm) !important;
+
+  .mat-calendar {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// Stepper
+.mat-step-header {
+  .mat-step-label {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// Tabs
+.mat-mdc-tab {
+  font-size: var(--font-size-sm) !important;
+  min-width: 120px !important;
+  padding: 0.5rem 1rem !important;
+}
+
+// Expansion panel
+.mat-expansion-panel-header {
+  font-size: var(--font-size-base) !important;
+  height: 3rem !important;
+}
+
+.mat-expansion-panel-body {
+  font-size: var(--font-size-sm) !important;
 }

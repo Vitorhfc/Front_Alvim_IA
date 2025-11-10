@@ -22,6 +22,20 @@
                 </div>
 
                 <div class="status-actions">
+                    <button class="btn-secondary" (click)="atualizarStatusManualmente()"
+                        [disabled]="atualizandoStatus || conectando || carregando"
+                        title="Atualizar status da conex\u00e3o">
+                        <span class="material-icons" [class.rotating]="atualizandoStatus">refresh</span>
+                        {{ atualizandoStatus ? 'Atualizando...' : 'Atualizar Status' }}
+                    </button>
+
+                    <button *ngIf="statusConexao.status === 'connected'" class="btn-secondary" (click)="reexibirQrCode()"
+                        [disabled]="conectando"
+                        title="Gerar novo QR Code para conectar outro dispositivo">
+                        <span class="material-icons">qr_code_2</span>
+                        Reexibir QR Code
+                    </button>
+
                     <button *ngIf="statusConexao.status === 'connected'" class="btn-danger" (click)="desconectar()"
                         [disabled]="conectando">
                         <span class="material-icons">power_settings_new</span>
@@ -99,7 +113,7 @@
         </section>
 
         <!-- Configuração do Telefone da Empresa -->
-        <section class="config-section">
+        <section class="config-section" *ngIf="false">
             <div class="section-header">
                 <span class="material-icons">business</span>
                 <h2 class="section-title">Telefone da Empresa</h2>

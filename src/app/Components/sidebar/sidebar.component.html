@@ -24,7 +24,7 @@
 
   <!-- User Footer -->
   <div class="sidebar-footer">
-    <div class="user-info"  *ngIf="usuario.usuarioId != '690e30ce82088f66afeb8643'">
+    <div class="user-info" *ngIf="usuario.usuarioId != '690e30ce82088f66afeb8643'">
       <div class="avatar">{{ getInitials() }}</div>
       <div class="user-details">
         <span class="user-name">{{ usuario?.nome || 'Usuário' }}</span>
@@ -37,7 +37,8 @@
         <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
       </button>
 
-      <button class="icon-btn logout-btn" (click)="logout()" title="Sair">
+      <button class="icon-btn logout-btn" (click)="logout()" title="Sair"
+        *ngIf="usuario.usuarioId != '690e30ce82088f66afeb8643'">
         <span class="material-icons">logout</span>
       </button>
     </div>

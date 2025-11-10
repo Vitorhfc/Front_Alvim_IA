@@ -6,8 +6,6 @@ import { SnackbarService } from '../../Service/snackbar';
 import { hideSpinner, ShowSpinner } from '../../Service/Local/spinner';
 import { WAHASessionStatus } from '../../Models/Objetos/waha.model';
 import { QRCodeComponent } from 'angularx-qrcode';
-import { SignalRHubService, WhatsAppStatusUpdate } from '../../Service/signalr-hub.service';
-import { Subscription } from 'rxjs';
 
 interface StatusConexao {
   status: 'connected' | 'disconnected' | 'connecting' | 'qr' | 'error';
@@ -44,158 +42,32 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
   // Nome da sessão WAHA (baseado na empresa)
   sessionName: string = '';
 
-  // SignalR - substituindo polling
-  private signalRSubscription?: Subscription;
-  private connectionStateSubscription?: Subscription;
-  private usarSignalR: boolean = true; // Flag para ativar/desativar SignalR
-
-  // Fallback: Intervalo de polling (usado apenas se SignalR falhar)
+  // Intervalo de polling para monitoramento automático
   private pollingInterval: any = null;
-  private readonly POLLING_INTERVAL_MS = 30000; // 30 segundos (reduzido drasticamente)
-  private readonly POLLING_FAST_INTERVAL_MS = 10000; // 10 segundos quando aguardando conexão
+  private readonly POLLING_SUCCESS_INTERVAL_MS = 480000; // 8 minutos quando conectado com sucesso
+  private readonly POLLING_ERROR_INTERVAL_MS = 300000; // 5 minutos quando houver erro
+  private readonly POLLING_FAST_INTERVAL_MS = 5000; // 5 segundos quando aguardando conexão/QR code
 
   // Controle de erros consecutivos
   private errosConsecutivos = 0;
-  private readonly MAX_ERROS_CONSECUTIVOS = 3; // Para polling após 3 erros seguidos
+  private readonly MAX_ERROS_CONSECUTIVOS = 3;
+
+  // Controle de atualização manual
+  atualizandoStatus: boolean = false;
 
   constructor(
     private wahaService: WahaService,
     private snackbarService: SnackbarService,
-    private cdr: ChangeDetectorRef,
-    private signalRService: SignalRHubService
+    private cdr: ChangeDetectorRef
   ) { }
 
   async ngOnInit(): Promise<void> {
     this.sessionName = await this.wahaService.getNomeSessaoPadrao();
-
-    // Inicializa SignalR
-    await this.inicializarSignalR();
-
     await this.carregarDados();
   }
 
   ngOnDestroy(): void {
     this.pararMonitoramento();
-    this.desconectarSignalR();
-  }
-
-  /**
-   * Inicializa a conexão SignalR e configura os listeners
-   */
-  private async inicializarSignalR(): Promise<void> {
-    if (!this.usarSignalR) {
-      console.log('SignalR desabilitado, usando apenas polling');
-      return;
-    }
-
-    try {
-      // Conecta ao SignalR
-      await this.signalRService.startConnection();
-
-      // Inscreve-se no grupo da sessão para receber atualizações específicas
-      await this.signalRService.joinGroup(this.sessionName);
-
-      // Configura listener para atualizações de status do WhatsApp
-      this.signalRSubscription = this.signalRService.whatsappStatus$.subscribe(
-        (update: WhatsAppStatusUpdate) => {
-          this.processarAtualizacaoSignalR(update);
-        }
-      );
-
-      // Monitora estado da conexão SignalR
-      this.connectionStateSubscription = this.signalRService.connectionState$.subscribe(
-        (connected: boolean) => {
-          if (!connected && this.usarSignalR) {
-            console.warn('SignalR desconectado, ativando fallback para polling');
-            this.iniciarMonitoramentoStatus();
-          } else if (connected) {
-            console.log('SignalR conectado, desativando polling');
-            this.pararMonitoramento();
-          }
-        }
-      );
-
-      console.log('✅ SignalR inicializado com sucesso');
-    } catch (error) {
-      console.error('❌ Erro ao inicializar SignalR, usando polling como fallback:', error);
-      this.usarSignalR = false;
-      this.iniciarMonitoramentoStatus();
-    }
-  }
-
-  /**
-   * Desconecta do SignalR e limpa subscriptions
-   */
-  private desconectarSignalR(): void {
-    if (this.signalRSubscription) {
-      this.signalRSubscription.unsubscribe();
-    }
-
-    if (this.connectionStateSubscription) {
-      this.connectionStateSubscription.unsubscribe();
-    }
-
-    if (this.signalRService.isConnected()) {
-      this.signalRService.leaveGroup(this.sessionName);
-      this.signalRService.stopConnection();
-    }
-  }
-
-  /**
-   * Processa atualizações recebidas via SignalR
-   */
-  private processarAtualizacaoSignalR(update: WhatsAppStatusUpdate): void {
-    console.log('📱 Atualização recebida via SignalR:', update);
-
-    // Verifica se a atualização é para esta sessão
-    if (update.sessionName !== this.sessionName) {
-      return;
-    }
-
-    // Mapeia status do WAHA para status interno
-    switch (update.status) {
-      case 'WORKING':
-        this.statusConexao.status = 'connected';
-        this.statusConexao.mensagem = update.message || 'WhatsApp conectado com sucesso';
-        if (update.telefone) {
-          this.telefoneEmpresa = this.formatarTelefoneExibicao(update.telefone);
-          this.telefoneOriginal = this.telefoneEmpresa;
-          this.statusConexao.telefone = this.telefoneEmpresa;
-        }
-        this.snackbarService.success('WhatsApp conectado com sucesso!');
-        break;
-
-      case 'SCAN_QR_CODE':
-        this.statusConexao.status = 'qr';
-        this.statusConexao.mensagem = update.message || 'Escaneie o QR Code no seu WhatsApp';
-        if (update.qrCode) {
-          this.statusConexao.qrCode = update.qrCode;
-        }
-        break;
-
-      case 'STARTING':
-        this.statusConexao.status = 'connecting';
-        this.statusConexao.mensagem = update.message || 'Iniciando sessão...';
-        break;
-
-      case 'FAILED':
-        this.statusConexao.status = 'error';
-        this.statusConexao.mensagem = update.message || 'Falha na conexão. Tente novamente.';
-        this.snackbarService.error('Erro na conexão do WhatsApp');
-        break;
-
-      case 'STOPPED':
-        this.statusConexao.status = 'disconnected';
-        this.statusConexao.mensagem = update.message || 'WhatsApp desconectado';
-        this.telefoneEmpresa = '';
-        this.telefoneOriginal = '';
-        break;
-
-      default:
-        console.warn('Status desconhecido recebido:', update.status);
-    }
-
-    this.cdr.detectChanges();
   }
 
   // ==================== CARREGAMENTO ====================
@@ -214,13 +86,9 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
         await this.carregarInformacoesConta();
       }
 
-      // Inicia monitoramento automático APENAS se SignalR não estiver ativo
-      if (!this.usarSignalR || !this.signalRService.isConnected()) {
-        console.log('Iniciando polling como fallback (SignalR não disponível)');
-        this.iniciarMonitoramentoStatus();
-      } else {
-        console.log('SignalR ativo, polling desabilitado');
-      }
+      // Inicia monitoramento automático via polling
+      console.log('✅ Iniciando monitoramento via polling');
+      this.iniciarMonitoramentoStatus();
 
       this.carregando = false;
       this.cdr.detectChanges();
@@ -247,18 +115,24 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
       this.errosConsecutivos = 0;
 
       this.statusConexao.sessionName = this.sessionName;
+      const statusAnterior = this.statusConexao.status;
 
       // Mapeia status do WAHA para status interno
       switch (statusResponse.status) {
         case WAHASessionStatus.WORKING:
           this.statusConexao.status = 'connected';
           this.statusConexao.mensagem = 'WhatsApp conectado com sucesso';
+
+          // Se mudou de outro status para conectado, mostra notificação
+          if (statusAnterior !== 'connected' && statusAnterior !== 'disconnected') {
+            this.snackbarService.success('WhatsApp conectado com sucesso!');
+          }
           break;
 
         case WAHASessionStatus.SCAN_QR_CODE:
           this.statusConexao.status = 'qr';
           this.statusConexao.mensagem = 'Escaneie o QR Code no seu WhatsApp';
-          // Busca o QR Code
+          // Busca o QR Code automaticamente
           await this.buscarQRCode();
           break;
 
@@ -270,10 +144,22 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
         case WAHASessionStatus.FAILED:
           this.statusConexao.status = 'error';
           this.statusConexao.mensagem = 'Falha na conexão. Tente novamente.';
+          // Mostra notificação de erro
+          if (statusAnterior !== 'error') {
+            this.snackbarService.error('Erro na conexão do WhatsApp');
+          }
           break;
 
         case WAHASessionStatus.STOPPED:
         default:
+          // Se estava conectado e agora está desconectado, limpa os dados
+          if (statusAnterior === 'connected') {
+            this.telefoneEmpresa = '';
+            this.telefoneOriginal = '';
+            this.statusConexao.telefone = undefined;
+            this.snackbarService.warning('WhatsApp desconectado');
+          }
+
           this.statusConexao.status = 'disconnected';
           this.statusConexao.mensagem = 'WhatsApp desconectado';
           break;
@@ -293,11 +179,13 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
         sessionName: this.sessionName
       };
 
-      // Se muitos erros consecutivos, para o polling
+      // Se muitos erros consecutivos, ajusta para polling de erro
       if (this.errosConsecutivos >= this.MAX_ERROS_CONSECUTIVOS) {
-        console.warn(`Parando polling após ${this.errosConsecutivos} erros consecutivos`);
-        this.pararMonitoramento();
-        this.statusConexao.mensagem = 'Erro ao conectar com o servidor. Clique em "Conectar WhatsApp" para tentar novamente.';
+        console.warn(`⚠️ ${this.errosConsecutivos} erros consecutivos detectados`);
+        this.statusConexao.mensagem = 'Erro ao conectar com o servidor. Verifique sua conexão.';
+
+        // Ajusta para intervalo de erro (5 minutos)
+        this.iniciarMonitoramentoStatus();
       }
 
       this.cdr.detectChanges();
@@ -341,46 +229,50 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Inicia monitoramento automático do status
-   * Nota: Usado apenas como fallback quando SignalR não está disponível
+   * Inicia monitoramento automático do status via polling
+   * Ajusta o intervalo de acordo com o status atual:
+   * - Rápido (5s) quando aguardando conexão ou QR code
+   * - Lento (8min) quando conectado com sucesso
+   * - Médio (5min) quando houver erro ou desconectado
    */
   iniciarMonitoramentoStatus(): void {
-    // Se SignalR estiver ativo, não inicia polling
-    if (this.usarSignalR && this.signalRService.isConnected()) {
-      console.log('SignalR ativo, polling não necessário');
-      return;
-    }
-
     this.pararMonitoramento(); // Para qualquer monitoramento anterior
 
-    const interval = this.statusConexao.status === 'qr' || this.statusConexao.status === 'connecting'
-      ? this.POLLING_FAST_INTERVAL_MS
-      : this.POLLING_INTERVAL_MS;
+    // Define intervalo baseado no status atual e erros consecutivos
+    let interval: number;
 
-    console.log(`Iniciando polling com intervalo de ${interval}ms`);
+    if (this.statusConexao.status === 'qr' || this.statusConexao.status === 'connecting') {
+      // Rápido (5s) quando aguardando conexão
+      interval = this.POLLING_FAST_INTERVAL_MS;
+    } else if (this.statusConexao.status === 'connected' && this.errosConsecutivos === 0) {
+      // Lento (8min) quando conectado com sucesso
+      interval = this.POLLING_SUCCESS_INTERVAL_MS;
+    } else {
+      // Médio (5min) quando desconectado, erro ou com erros consecutivos
+      interval = this.POLLING_ERROR_INTERVAL_MS;
+    }
+
+    console.log(`📡 Iniciando polling com intervalo de ${interval}ms (status: ${this.statusConexao.status}, erros: ${this.errosConsecutivos})`);
 
     this.pollingInterval = setInterval(async () => {
-      // Verifica novamente se SignalR foi estabelecido
-      if (this.usarSignalR && this.signalRService.isConnected()) {
-        console.log('SignalR conectado, parando polling');
-        this.pararMonitoramento();
-        return;
-      }
-
-      if (!this.carregando && !this.conectando) {
+      // Só verifica se não estiver carregando ou conectando
+      if (!this.carregando && !this.conectando && !this.atualizandoStatus) {
         const statusAnterior = this.statusConexao.status;
         await this.verificarStatusConexao();
 
-        // Se mudou de QR/connecting para connected, carrega informações
+        // Se mudou de QR/connecting para connected, carrega informações da conta
         if (statusAnterior !== 'connected' && this.statusConexao.status === 'connected') {
           await this.carregarInformacoesConta();
-          this.snackbarService.success('WhatsApp conectado com sucesso!');
-          // Reduz frequência de polling
+          // Ajusta intervalo de polling para menos frequente
           this.iniciarMonitoramentoStatus();
         }
-        // Se mudou para QR/connecting, aumenta frequência
+        // Se mudou para QR/connecting, aumenta frequência de polling
         else if ((this.statusConexao.status === 'qr' || this.statusConexao.status === 'connecting')
                  && statusAnterior !== this.statusConexao.status) {
+          this.iniciarMonitoramentoStatus();
+        }
+        // Se perdeu conexão, ajusta intervalo
+        else if (statusAnterior === 'connected' && this.statusConexao.status !== 'connected') {
           this.iniciarMonitoramentoStatus();
         }
       }
@@ -506,6 +398,69 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
     } catch (error: any) {
       console.error('Erro ao atualizar QR Code:', error);
       this.snackbarService.error(error.message || 'Erro ao atualizar QR Code');
+      this.conectando = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Atualiza o status manualmente (botão de refresh)
+   */
+  async atualizarStatusManualmente(): Promise<void> {
+    this.atualizandoStatus = true;
+    this.cdr.detectChanges();
+
+    try {
+      const statusAnterior = this.statusConexao.status;
+
+      // Verifica o status atual
+      await this.verificarStatusConexao();
+
+      // Se conectado, carrega informações da conta
+      if (this.statusConexao.status === 'connected') {
+        await this.carregarInformacoesConta();
+      }
+
+      // Se mudou de status, reinicia o monitoramento com novo intervalo
+      if (statusAnterior !== this.statusConexao.status) {
+        this.iniciarMonitoramentoStatus();
+      }
+
+      this.snackbarService.success('Status atualizado com sucesso');
+      this.atualizandoStatus = false;
+      this.cdr.detectChanges();
+
+    } catch (error: any) {
+      console.error('Erro ao atualizar status:', error);
+      this.snackbarService.error('Erro ao atualizar status');
+      this.atualizandoStatus = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Reexibe o QR Code (busca novamente ou reinicia a sessão)
+   */
+  async reexibirQrCode(): Promise<void> {
+    this.conectando = true;
+    this.cdr.detectChanges();
+
+    try {
+      // Se já está no status QR, apenas busca novamente
+      if (this.statusConexao.status === 'qr') {
+        await this.buscarQRCode();
+        this.snackbarService.success('QR Code atualizado');
+      } else {
+        // Se não está no status QR, inicia uma nova conexão
+        await this.iniciarConexao();
+      }
+
+      this.conectando = false;
+      this.cdr.detectChanges();
+
+    } catch (error: any) {
+      console.error('Erro ao reexibir QR Code:', error);
+      this.snackbarService.error(error.message || 'Erro ao obter QR Code');
       this.conectando = false;
       this.cdr.detectChanges();
     }
