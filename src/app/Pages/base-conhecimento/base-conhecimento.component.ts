@@ -19,6 +19,7 @@ export class BaseConhecimentoComponent implements OnInit {
   carregando: boolean = true;
 
   configuracao: Partial<ConfiguracaoIA> = {
+    nome: '',
     funcaoPrincipalDoProduto: '',
     modulosFuncionalidadesDoProduto: '',
     processoDeUsoProduto: '',
@@ -117,6 +118,7 @@ export class BaseConhecimentoComponent implements OnInit {
       this.configuracao = { ...this.configuracaoOriginal };
     } else {
       this.configuracao = {
+        nome: '',
         funcaoPrincipalDoProduto: '',
         modulosFuncionalidadesDoProduto: '',
         processoDeUsoProduto: '',

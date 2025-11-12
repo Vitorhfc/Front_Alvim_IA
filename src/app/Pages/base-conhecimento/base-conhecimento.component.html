@@ -19,6 +19,24 @@
         </div>
       </div>
 
+      <!-- Campo de Nome -->
+      <section class="config-section">
+        <div class="section-header">
+          <span class="material-icons">badge</span>
+          <h2 class="section-title">Identificação</h2>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">Nome da Configuração</span>
+          </label>
+          <span class="label-hint">Dê um nome para identificar esta configuração</span>
+          <input type="text" [(ngModel)]="configuracao.nome"
+            class="form-input"
+            placeholder="Ex: Configuração Principal, Atendimento Vendas..."/>
+        </div>
+      </section>
+
       <!-- Seção: Informações do Produto -->
       <section class="config-section">
         <div class="section-header">

@@ -14,6 +14,7 @@ export interface ConfiguracaoArquivos {
 }
 
 export interface ConfiguracaoIA extends BaseEntidade {
+    nome: string;
     funcaoPrincipalDoProduto: string;
     modulosFuncionalidadesDoProduto: string;
     processoDeUsoProduto: string;
