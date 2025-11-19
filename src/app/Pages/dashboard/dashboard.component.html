@@ -135,18 +135,25 @@
         <section class="info-row">
           <!-- Últimas Conversas -->
           <div class="info-card conversas-card">
-            <h3 class="card-title">Últimas Conversas</h3>
+            <div class="card-header">
+              <h3 class="card-title">Últimas Conversas</h3>
+              <span class="material-icons card-icon">forum</span>
+            </div>
             <div class="conversas-list">
               @if (conversasRecentes.length > 0) {
                 @for (conversa of conversasRecentes; track conversa.id) {
-                  <div class="conversa-item">
+                  <div class="conversa-item" [attr.data-status]="conversa.status">
                     <div class="conversa-avatar">
-                      <span class="material-icons">account_circle</span>
+                      <div class="avatar-circle">
+                        <span class="material-icons">person</span>
+                      </div>
+                      <div class="status-indicator" [style.background]="getStatusColor(conversa.status)"></div>
                     </div>
                     <div class="conversa-info">
                       <div class="conversa-header">
                         <span class="conversa-nome">{{ conversa.clienteNome }}</span>
-                        <span class="conversa-status" [style.color]="getStatusColor(conversa.status)">
+                        <span class="conversa-status" [style.background]="getStatusColor(conversa.status) + '20'" [style.color]="getStatusColor(conversa.status)">
+                          <span class="status-dot" [style.background]="getStatusColor(conversa.status)"></span>
                           {{ conversa.status }}
                         </span>
                       </div>

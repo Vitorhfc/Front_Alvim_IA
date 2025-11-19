@@ -31,9 +31,22 @@
             <span class="label-text">Nome da Configuração</span>
           </label>
           <span class="label-hint">Dê um nome para identificar esta configuração</span>
-          <input type="text" [(ngModel)]="configuracao.nome"
-            class="form-input"
-            placeholder="Ex: Configuração Principal, Atendimento Vendas..."/>
+          <div class="input-wrapper">
+            <input type="text" [(ngModel)]="configuracao.nome"
+              class="form-input"
+              placeholder="Ex: Configuração Principal, Atendimento Vendas..."/>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(1)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(1)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(1)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -49,9 +62,22 @@
             <span class="label-text">Função Principal do Produto</span>
           </label>
           <span class="label-hint">Descreva a principal função ou objetivo do seu produto/serviço</span>
-          <textarea [(ngModel)]="configuracao.funcaoPrincipalDoProduto" rows="4"
-            class="form-textarea"
-            placeholder="Ex: Plataforma de atendimento ao cliente com IA integrada para automatizar respostas e gerenciar conversas..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.funcaoPrincipalDoProduto" rows="4"
+              class="form-textarea"
+              placeholder="Ex: Plataforma de atendimento ao cliente com IA integrada para automatizar respostas e gerenciar conversas..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(2)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(2)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(2)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -59,9 +85,22 @@
             <span class="label-text">Módulos e Funcionalidades</span>
           </label>
           <span class="label-hint">Liste os principais módulos e funcionalidades disponíveis</span>
-          <textarea [(ngModel)]="configuracao.modulosFuncionalidadesDoProduto" rows="4"
-            class="form-textarea"
-            placeholder="Ex: Dashboard de métricas, Gestão de conversas, Templates de mensagens, Agendamentos, Base de conhecimento..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.modulosFuncionalidadesDoProduto" rows="4"
+              class="form-textarea"
+              placeholder="Ex: Dashboard de métricas, Gestão de conversas, Templates de mensagens, Agendamentos, Base de conhecimento..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(3)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(3)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(3)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -69,9 +108,22 @@
             <span class="label-text">Processo de Uso do Produto</span>
           </label>
           <span class="label-hint">Explique como os clientes devem usar o produto</span>
-          <textarea [(ngModel)]="configuracao.processoDeUsoProduto" rows="4"
-            class="form-textarea"
-            placeholder="Ex: 1. Cadastre-se na plataforma, 2. Configure sua empresa, 3. Integre com WhatsApp, 4. Configure a IA..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.processoDeUsoProduto" rows="4"
+              class="form-textarea"
+              placeholder="Ex: 1. Cadastre-se na plataforma, 2. Configure sua empresa, 3. Integre com WhatsApp, 4. Configure a IA..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(4)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(4)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(4)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -87,9 +139,22 @@
             <span class="label-text">Perguntas Frequentes</span>
           </label>
           <span class="label-hint">Liste as perguntas mais comuns sobre o produto</span>
-          <textarea [(ngModel)]="configuracao.perguntasFrequentesSobreProduto" rows="5"
-            class="form-textarea"
-            placeholder="Ex: Como integrar com WhatsApp? Como configurar a IA? Qual o limite de mensagens?..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.perguntasFrequentesSobreProduto" rows="5"
+              class="form-textarea"
+              placeholder="Ex: Como integrar com WhatsApp? Como configurar a IA? Qual o limite de mensagens?..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(5)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(5)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(5)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -97,9 +162,22 @@
             <span class="label-text">Suporte e Atendimento</span>
           </label>
           <span class="label-hint">Informações sobre canais de suporte e atendimento</span>
-          <textarea [(ngModel)]="configuracao.suporteEAtendimentoDoProduto" rows="4"
-            class="form-textarea"
-            placeholder="Ex: Suporte por email: suporte@empresa.com, WhatsApp: (11) 99999-9999, Horário: 8h às 18h..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.suporteEAtendimentoDoProduto" rows="4"
+              class="form-textarea"
+              placeholder="Ex: Suporte por email: suporte@empresa.com, WhatsApp: (11) 99999-9999, Horário: 8h às 18h..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(6)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(6)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(6)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -115,9 +193,22 @@
             <span class="label-text">Dores Atendidas</span>
           </label>
           <span class="label-hint">Quais problemas seu produto resolve?</span>
-          <textarea [(ngModel)]="configuracao.doresAtendidasPeloProduto" rows="4"
-            class="form-textarea"
-            placeholder="Ex: Reduz tempo de resposta, Automatiza atendimentos repetitivos, Melhora satisfação do cliente..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.doresAtendidasPeloProduto" rows="4"
+              class="form-textarea"
+              placeholder="Ex: Reduz tempo de resposta, Automatiza atendimentos repetitivos, Melhora satisfação do cliente..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(7)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(7)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(7)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -125,9 +216,22 @@
             <span class="label-text">Diferenças e Vantagens</span>
           </label>
           <span class="label-hint">O que torna seu produto único?</span>
-          <textarea [(ngModel)]="configuracao.diferencasVantagensDoProduto" rows="4"
-            class="form-textarea"
-            placeholder="Ex: IA treinada especificamente para seu negócio, Interface intuitiva, Integração com múltiplos canais..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.diferencasVantagensDoProduto" rows="4"
+              class="form-textarea"
+              placeholder="Ex: IA treinada especificamente para seu negócio, Interface intuitiva, Integração com múltiplos canais..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(8)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(8)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(8)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -143,9 +247,22 @@
             <span class="label-text">Integrações e Recursos Extras</span>
           </label>
           <span class="label-hint">Quais integrações e recursos adicionais estão disponíveis?</span>
-          <textarea [(ngModel)]="configuracao.integracoesRecursosExtrasProduto" rows="4"
-            class="form-textarea" 
-            placeholder="Ex: WhatsApp Business API, CRM, Email, Webhooks, API REST..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.integracoesRecursosExtrasProduto" rows="4"
+              class="form-textarea"
+              placeholder="Ex: WhatsApp Business API, CRM, Email, Webhooks, API REST..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(9)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(9)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(9)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -161,9 +278,22 @@
             <span class="label-text">Planos, Preços e Condições Comerciais</span>
           </label>
           <span class="label-hint">Descreva os planos disponíveis e condições de pagamento</span>
-          <textarea [(ngModel)]="configuracao.planosPrecosCondicoesComerciaisDoProduto"
-            rows="4" class="form-textarea"
-            placeholder="Ex: Plano Básico: R$ 99/mês, Plano Pro: R$ 299/mês, Plano Enterprise: Sob consulta..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.planosPrecosCondicoesComerciaisDoProduto"
+              rows="4" class="form-textarea"
+              placeholder="Ex: Plano Básico: R$ 99/mês, Plano Pro: R$ 299/mês, Plano Enterprise: Sob consulta..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(10)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(10)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(10)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -179,9 +309,22 @@
             <span class="label-text">Casos de Uso e Exemplos Práticos</span>
           </label>
           <span class="label-hint">Exemplos reais de como usar o sistema</span>
-          <textarea [(ngModel)]="configuracao.casosDeUsoExemplosPraticosEValoresSistema"
-            rows="4" class="form-textarea"
-            placeholder="Ex: E-commerce respondendo dúvidas sobre produtos, Clínica agendando consultas, Restaurante recebendo pedidos..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.casosDeUsoExemplosPraticosEValoresSistema"
+              rows="4" class="form-textarea"
+              placeholder="Ex: E-commerce respondendo dúvidas sobre produtos, Clínica agendando consultas, Restaurante recebendo pedidos..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(11)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(11)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(11)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -197,8 +340,21 @@
             <span class="label-text">Informações Adicionais</span>
           </label>
           <span class="label-hint">Qualquer outra informação relevante que a IA deve conhecer</span>
-          <textarea [(ngModel)]="configuracao.informacoesGerais" rows="4" class="form-textarea"
-            placeholder="Ex: Empresa fundada em 2020, Atendemos todo Brasil, Certificações ISO..."></textarea>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="configuracao.informacoesGerais" rows="4" class="form-textarea"
+              placeholder="Ex: Empresa fundada em 2020, Atendemos todo Brasil, Certificações ISO..."></textarea>
+            <button
+              *ngIf="deveExibirBotaoMelhorar(12)"
+              class="btn-melhorar"
+              (click)="melhorarTexto(12)"
+              type="button"
+              title="Melhorar texto com IA">
+              <span class="material-icons">auto_awesome</span>
+            </button>
+            <div class="spinner-overlay" *ngIf="estaMelhorando(12)">
+              <div class="spinner-ia"></div>
+            </div>
+          </div>
         </div>
       </section>
 

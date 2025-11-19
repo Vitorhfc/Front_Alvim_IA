@@ -5,6 +5,7 @@ import { ClientService } from '../../Service/Api/client.service';
 import { ConfiguracaoIA } from '../../Models/Entidades/Client/ConfiguracaoIa';
 import { SnackbarService } from '../../Service/snackbar';
 import { hideSpinner, ShowSpinner, SpinnerService } from '../../Service/Local/spinner';
+import { IaMelhoramentoService, CampoMelhoramento } from '../../Service/Api/ia-melhoramento.service';
 
 @Component({
   selector: 'app-base-conhecimento',
@@ -36,10 +37,30 @@ export class BaseConhecimentoComponent implements OnInit {
 
   configuracaoOriginal: Partial<ConfiguracaoIA> | null = null;
 
+  // Controle de melhoramento de texto com IA
+  melhorandoCampo: { [key: number]: boolean } = {};
+
+  // Mapeamento de campos com seus IDs
+  camposMapeamento = [
+    { id: 1, campo: 'nome', label: 'Nome da Configuração' },
+    { id: 2, campo: 'funcaoPrincipalDoProduto', label: 'Função Principal do Produto' },
+    { id: 3, campo: 'modulosFuncionalidadesDoProduto', label: 'Módulos e Funcionalidades' },
+    { id: 4, campo: 'processoDeUsoProduto', label: 'Processo de Uso do Produto' },
+    { id: 5, campo: 'perguntasFrequentesSobreProduto', label: 'Perguntas Frequentes' },
+    { id: 6, campo: 'suporteEAtendimentoDoProduto', label: 'Suporte e atendimento' },
+    { id: 7, campo: 'doresAtendidasPeloProduto', label: 'Dores atendidas' },
+    { id: 8, campo: 'diferencasVantagensDoProduto', label: 'Diferenças e vantagens' },
+    { id: 9, campo: 'integracoesRecursosExtrasProduto', label: 'Integrações e recursos extras' },
+    { id: 10, campo: 'planosPrecosCondicoesComerciaisDoProduto', label: 'Planos, preços e condições comerciais' },
+    { id: 11, campo: 'casosDeUsoExemplosPraticosEValoresSistema', label: 'Casos de uso e exemplos praticos' },
+    { id: 12, campo: 'informacoesGerais', label: 'Informações adicionais' }
+  ];
+
   constructor(
     private clientService: ClientService,
     private snackbarService: SnackbarService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private iaMelhoramentoService: IaMelhoramentoService
   ) { }
 
   ngOnInit(): void {
@@ -151,7 +172,76 @@ export class BaseConhecimentoComponent implements OnInit {
 
   get formularioAlterado(): boolean {
     if (!this.configuracaoOriginal) return true;
-    
+
     return JSON.stringify(this.configuracao) !== JSON.stringify(this.configuracaoOriginal);
+  }
+
+  // ==================== MELHORAMENTO COM IA ====================
+
+  /**
+   * Verifica se deve exibir o botão de melhorar para um campo específico
+   */
+  deveExibirBotaoMelhorar(idCampo: number): boolean {
+    const campo = this.camposMapeamento.find(c => c.id === idCampo);
+    if (!campo) return false;
+
+    const valor = (this.configuracao as any)[campo.campo];
+    return valor && valor.trim().length > 0 && !this.melhorandoCampo[idCampo];
+  }
+
+  /**
+   * Verifica se está melhorando um campo específico
+   */
+  estaMelhorando(idCampo: number): boolean {
+    return this.melhorandoCampo[idCampo] || false;
+  }
+
+  /**
+   * Melhora o texto de um campo usando IA
+   */
+  async melhorarTexto(idCampo: number): Promise<void> {
+    const campo = this.camposMapeamento.find(c => c.id === idCampo);
+    if (!campo) {
+      this.snackbarService.error('Campo não encontrado');
+      return;
+    }
+
+    const textoAtual = (this.configuracao as any)[campo.campo];
+    if (!textoAtual || textoAtual.trim().length === 0) {
+      this.snackbarService.error('Preencha o campo antes de melhorar');
+      return;
+    }
+
+    // Marca como melhorando
+    this.melhorandoCampo[idCampo] = true;
+    this.cdr.detectChanges();
+
+    try {
+      // Prepara todos os campos para contexto
+      const todosCampos: CampoMelhoramento[] = this.camposMapeamento.map(c => ({
+        idCampo: c.id,
+        texto: c.label
+      }));
+
+      // Chama o serviço de melhoramento
+      const textoMelhorado = await this.iaMelhoramentoService.melhorarTexto(
+        idCampo,
+        textoAtual,
+        todosCampos
+      );
+
+      // Atualiza o campo com o texto melhorado
+      (this.configuracao as any)[campo.campo] = textoMelhorado;
+
+      this.snackbarService.success('Texto melhorado com sucesso!');
+      this.melhorandoCampo[idCampo] = false;
+      this.cdr.detectChanges();
+
+    } catch (error: any) {
+      console.error('Erro ao melhorar texto:', error);
+      this.snackbarService.error(error.message || 'Erro ao melhorar texto');
+      this.melhorandoCampo[idCampo] = false;
+      this.cdr.detectChanges();
+    }
   }
 }
