@@ -23,10 +23,11 @@ export class LoginEmpresaComponent implements OnInit {
     private authService: AuthService,
     private spinnerService: SpinnerService,
     private snackBar: SnackBar
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    // Captura o empresaId da rota
+    this.authService.logout();
+
     this.route.params.subscribe(params => {
       this.empresaId = params['empresaId'];
 
@@ -49,18 +50,15 @@ export class LoginEmpresaComponent implements OnInit {
         empresaId: this.empresaId
       });
 
-      // Salvar dados da autenticação
       this.authService.salvarDadosAutenticacao(response);
 
-      // Mostrar mensagem de sucesso
       this.snackBar.success('Login realizado com sucesso!');
 
-      // Redirecionar para o dashboard
       this.router.navigate(['/dashboard']);
 
     } catch (error: any) {
       this.error = error.message || 'Erro ao realizar login';
-      this.snackBar.error(this.error! );
+      this.snackBar.error(this.error!);
       console.error('Erro no login da empresa:', error);
     } finally {
       this.loading = false;

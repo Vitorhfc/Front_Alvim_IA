@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiClient: 'https://api-client.seudominio.com',
-    apiAdmin: 'https://api-admin.seudominio.com'
+    url_Client: 'https://prd-sdr.azurewebsites.net/api',
+    url_ADMIN: 'https://prd-admin-sdr.azurewebsites.net/api'
 };
