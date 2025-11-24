@@ -71,12 +71,12 @@ export const routes: Routes = [
         title: 'Conversas - AI Agent'
     },
     // ==================== ROTAS TEMPORARIAMENTE DESABILITADAS ====================
-    // {
-    //     path: 'cliente/:id',
-    //     component: ClienteComponent,
-    //     canActivate: [logadoGuard],
-    //     title: 'Detalhes do Cliente - AI Agent'
-    // },
+    {
+        path: 'cliente/:id',
+        component: ClienteComponent,
+        canActivate: [logadoGuard],
+        title: 'Detalhes do Cliente - AI Agent'
+    },
     // {
     //     path: 'analises',
     //     component: AnalisesComponent,
@@ -108,21 +108,18 @@ export const routes: Routes = [
         canActivate: [logadoGuard],
         title: 'Configuração WhatsApp - AI Agent'
     },
-    // ==================== ROTAS TEMPORARIAMENTE DESABILITADAS ====================
-    // {
-    //     path: 'funcionarios',
-    //     component: FuncionariosComponent,
-    //     canActivate: [logadoGuard],
-    //     title: 'Gerenciamento de Funcionários - AI Agent'
-    // },
-    // {
-    //     path: 'agendamentos',
-    //     component: AgendamentosComponent,
-    //     canActivate: [logadoGuard],
-    //     title: 'Agendamentos - AI Agent'
-    // },
-    // ==================== FIM ROTAS DESABILITADAS ====================
-    // ==================== FALLBACK ====================
+    {
+        path: 'funcionarios',
+        component: FuncionariosComponent,
+        canActivate: [logadoGuard],
+        title: 'Gerenciamento de Funcionários - AI Agent'
+    },
+    {
+        path: 'agendamentos',
+        component: AgendamentosComponent,
+        canActivate: [logadoGuard],
+        title: 'Agendamentos - AI Agent'
+    },
     {
         path: '**',
         redirectTo: ''

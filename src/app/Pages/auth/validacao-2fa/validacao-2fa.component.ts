@@ -40,6 +40,7 @@ export class Validacao2FAComponent implements AfterViewInit {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  private lastProcessedValues: string[] = ['', '', '', '', '', ''];
 
   constructor(
     private authService: AuthService,
@@ -98,20 +99,39 @@ export class Validacao2FAComponent implements AfterViewInit {
   }
 
   onDigitInput(event: any, index: number): void {
-    const input = event.target;
-    const value = input.value.replace(/\D/g, '');
+    const input = event.target as HTMLInputElement;
+    const rawValue = input.value;
 
-    this.tokenDigits[index] = value.substring(0, 1);
+    // Remove todos os caracteres não numéricos e pega apenas o primeiro dígito
+    const cleanValue = rawValue.replace(/\D/g, '');
+    const digit = cleanValue.charAt(0) || '';
 
-    if (value && index < 5) {
-      const nextInput = input.nextElementSibling;
+    // Verifica se esse valor já foi processado (previne duplicação)
+    if (this.lastProcessedValues[index] === digit && this.tokenDigits[index] === digit) {
+      // Já processamos esse valor, não fazer nada
+      return;
+    }
+
+    // Atualiza o valor processado
+    this.lastProcessedValues[index] = digit;
+    this.tokenDigits[index] = digit;
+
+    // Atualiza o input apenas se necessário
+    if (input.value !== digit) {
+      input.value = digit;
+    }
+
+    // Move para o próximo input se um dígito foi inserido
+    if (digit && index < 5) {
+      const nextInput = input.nextElementSibling as HTMLInputElement;
       if (nextInput) {
-        nextInput.focus();
+        setTimeout(() => nextInput.focus(), 0);
       }
     }
 
-    if (this.tokenDigits.every(digit => digit !== '')) {
-      this.confirmarValidacao();
+    // Valida automaticamente se todos os dígitos foram preenchidos
+    if (this.tokenDigits.every(d => d !== '')) {
+      setTimeout(() => this.confirmarValidacao(), 100);
     }
   }
 
@@ -142,8 +162,12 @@ export class Validacao2FAComponent implements AfterViewInit {
     const pasteData = event.clipboardData?.getData('text').replace(/\D/g, '');
 
     if (pasteData && pasteData.length === 6) {
+      const inputs = document.querySelectorAll('.digit-input') as NodeListOf<HTMLInputElement>;
       for (let i = 0; i < 6; i++) {
         this.tokenDigits[i] = pasteData[i];
+        if (inputs[i]) {
+          inputs[i].value = pasteData[i];
+        }
       }
       this.confirmarValidacao();
     }
@@ -162,6 +186,11 @@ export class Validacao2FAComponent implements AfterViewInit {
 
   private limparToken(): void {
     this.tokenDigits = ['', '', '', '', '', ''];
+    this.lastProcessedValues = ['', '', '', '', '', ''];
+    const inputs = document.querySelectorAll('.digit-input') as NodeListOf<HTMLInputElement>;
+    inputs.forEach(input => {
+      input.value = '';
+    });
     this.focusFirstInput();
   }
 
@@ -183,5 +212,9 @@ export class Validacao2FAComponent implements AfterViewInit {
 
   get getTipoValidacaoTexto(): string {
     return this.tipoValidacao === 0 ? 'E-mail' : 'WhatsApp';
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }

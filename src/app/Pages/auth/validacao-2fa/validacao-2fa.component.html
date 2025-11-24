@@ -15,10 +15,9 @@
 
     <div class="digit-inputs">
       <input
-        *ngFor="let digit of tokenDigits; let i = index"
+        *ngFor="let digit of tokenDigits; let i = index; trackBy: trackByIndex"
         type="text"
         class="digit-input"
-        [(ngModel)]="tokenDigits[i]"
         [disabled]="loading"
         maxlength="1"
         (input)="onDigitInput($event, i)"

@@ -32,8 +32,8 @@ export class SidebarComponent implements OnInit {
   menuItems: MenuItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
     { icon: 'chat', label: 'Conversas', route: '/conversas'},
-    { icon: 'event', label: 'Agendamentos', route: '/agendamentos', disabled: true }, // Desabilitado temporariamente
-    { icon: 'people', label: 'Funcionários', route: '/funcionarios', disabled: true }, // Desabilitado temporariamente
+    { icon: 'event', label: 'Agendamentos', route: '/agendamentos' }, // Desabilitado temporariamente
+    { icon: 'people', label: 'Funcionários', route: '/funcionarios' }, // Desabilitado temporariamente
     { icon: 'analytics', label: 'Análises', route: '/analises', disabled: true }, // Desabilitado temporariamente
     { icon: 'description', label: 'Templates', route: '/templates', disabled: true }, // Desabilitado temporariamente
     { icon: 'menu_book', label: 'Base de Conhecimento', route: '/base-conhecimento' },
