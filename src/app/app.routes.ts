@@ -15,6 +15,8 @@ import { ConfiguracoesComponent } from './Pages/configuracoes/configuracoes.comp
 import { FuncionariosComponent } from './Pages/funcionarios/funcionarios.component';
 import { AgendamentosComponent } from './Pages/agendamentos/agendamentos.component';
 import { WhatsappConfigComponent } from './Pages/whatsapp-config/whatsapp-config';
+import { LogWahaView } from './Pages/Pagina logs/log-waha-view/log-waha-view';
+import { LogClientView } from './Pages/Pagina logs/log-client-view/log-client-view';
 
 export const routes: Routes = [
     // ==================== ROTAS PÚBLICAS ====================
@@ -51,18 +53,30 @@ export const routes: Routes = [
         title: 'Dashboard - AI Agent'
     },
     {
+        path: 'LogWhatsapp',
+        component: LogWahaView,
+        canActivate: [logadoGuard],
+        title: 'Log WhatsApp'
+    },
+    {
+        path: 'LogsClient',
+        component: LogClientView,
+        canActivate: [logadoGuard],
+        title: 'Logs Client'
+    },
+    {
         path: 'conversas',
         component: ConversasComponent,
         canActivate: [logadoGuard],
         title: 'Conversas - AI Agent'
     },
-    {
-        path: 'cliente/:id',
-        component: ClienteComponent,
-        canActivate: [logadoGuard],
-        title: 'Detalhes do Cliente - AI Agent'
-    },
     // ==================== ROTAS TEMPORARIAMENTE DESABILITADAS ====================
+    // {
+    //     path: 'cliente/:id',
+    //     component: ClienteComponent,
+    //     canActivate: [logadoGuard],
+    //     title: 'Detalhes do Cliente - AI Agent'
+    // },
     // {
     //     path: 'analises',
     //     component: AnalisesComponent,

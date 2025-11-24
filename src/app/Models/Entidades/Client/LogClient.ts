@@ -34,3 +34,11 @@ export interface LogClient extends BaseEntidade {
     userAgent: string;
     nivelSeveridade: NivelSeveridade;
 }
+
+export interface LogClientPaginado {
+    page: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+    items: LogClient[];
+}

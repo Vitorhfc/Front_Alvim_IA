@@ -6,13 +6,14 @@ import { LocalStorageService } from '../Local/local-storage';
 
 // Importar modelos de entidades do Cliente
 import { Cliente } from '../../Models/Entidades/Client/Cliente';
-import { Mensagem } from '../../Models/Entidades/Client/Mensagem';
+import { Mensagem, MensagensClienteResponse } from '../../Models/Entidades/Client/Mensagem';
 import { Agendamento } from '../../Models/Entidades/Client/Agendamento';
 import { Arquivo } from '../../Models/Entidades/Client/Arquivo';
 import { ConfiguracaoIA } from '../../Models/Entidades/Client/ConfiguracaoIa';
 import { ProcessamentoIA } from '../../Models/Entidades/Client/ProcessamentoIa';
 import { Funcionario } from '../../Models/Entidades/Client/Funcionario';
-import { LogClient } from '../../Models/Entidades/Client/LogClient';
+import { LogClient, LogClientPaginado } from '../../Models/Entidades/Client/LogClient';
+import { LogWaha, LogWahaPaginado } from '../../Models/Entidades/Client/LogWaha';
 
 /**
  * Service para integração com a API de Cliente
@@ -78,15 +79,12 @@ export class ClientService extends BaseApiService {
   // ==================== MENSAGENS ====================
 
   /**
-   * Lista mensagens de uma conversa
+   * Lista mensagens de uma conversa com informações do cliente
+   * @param clienteId ID do cliente
+   * @param ordenacao Ordenação das mensagens: 'asc' (mais antigas primeiro) ou 'desc' (mais recentes primeiro)
    */
-  async listarMensagensConversa(clienteId: string, limit?: number, offset?: number): Promise<Mensagem[]> {
-    const params = new URLSearchParams();
-    if (limit) params.append('limit', limit.toString());
-    if (offset) params.append('offset', offset.toString());
-
-    const query = params.toString() ? `?${params.toString()}` : '';
-    return this.get<Mensagem[]>(`/Mensagem/cliente/${clienteId}${query}`);
+  async listarMensagensConversa(clienteId: string, ordenacao: 'asc' | 'desc' = 'asc'): Promise<MensagensClienteResponse> {
+    return this.get<MensagensClienteResponse>(`/Cliente/${clienteId}/mensagens?ordenacao=${ordenacao}`);
   }
 
   /**
@@ -352,6 +350,20 @@ export class ClientService extends BaseApiService {
    */
   async buscarLogPorId(id: string): Promise<LogClient> {
     return this.get<LogClient>(`/Log/${id}`);
+  }
+
+  /**
+   * Lista logs do WAHA com paginação
+   */
+  async listarLogsWaha(page: number = 1, pageSize: number = 80): Promise<LogWahaPaginado> {
+    return this.get<LogWahaPaginado>(`/Log/waha?page=${page}&pageSize=${pageSize}`);
+  }
+
+  /**
+   * Lista logs do cliente com paginação
+   */
+  async listarLogsClient(page: number = 1, pageSize: number = 50): Promise<LogClientPaginado> {
+    return this.get<LogClientPaginado>(`/Log/client?page=${page}&pageSize=${pageSize}`);
   }
 
   // ==================== ESTATÍSTICAS ====================

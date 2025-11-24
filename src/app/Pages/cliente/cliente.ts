@@ -96,12 +96,12 @@ export class ClienteComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      const mensagensAPI = await this.clientService.listarMensagensConversa(
+      const response = await this.clientService.listarMensagensConversa(
         this.cliente.id,
-        100
+        'asc'
       );
-      
-      this.mensagens = mensagensAPI
+
+      this.mensagens = response.mensagens
         .map(msg => ({
           id: msg.id || '',
           remetenteId: msg.clienteId || 'Sistema',

@@ -104,7 +104,7 @@
       </header>
 
       <!-- Mensagens -->
-      <div class="chat-messages">
+      <div class="chat-messages" *ngIf="!loadingMensagens">
         <div
           class="mensagem"
           *ngFor="let mensagem of mensagens"
@@ -112,10 +112,86 @@
           [class.mensagem-ia]="!mensagem.isUsuario"
         >
           <div class="mensagem-conteudo">
-            <p class="mensagem-texto">{{ mensagem.texto }}</p>
+            <!-- Mensagem de texto -->
+            <p class="mensagem-texto" *ngIf="mensagem.texto">{{ mensagem.texto }}</p>
+
+            <!-- Mídia (Imagem, Vídeo, Documento, etc) -->
+            <div class="mensagem-midia" *ngIf="mensagem.midia">
+              <!-- Imagem -->
+              <div class="midia-imagem" *ngIf="mensagem.tipoMensagem === 3">
+                <img
+                  *ngIf="mensagem.midia.urlDownload"
+                  [src]="mensagem.midia.urlDownload"
+                  [alt]="mensagem.midia.nomeArquivo || 'Imagem'"
+                  class="midia-img"
+                />
+                <div class="midia-placeholder" *ngIf="!mensagem.midia.urlDownload">
+                  <span class="material-icons">image</span>
+                  <p>Imagem não disponível</p>
+                </div>
+                <p class="midia-caption" *ngIf="mensagem.midia.caption">{{ mensagem.midia.caption }}</p>
+              </div>
+
+              <!-- Vídeo -->
+              <div class="midia-video" *ngIf="mensagem.tipoMensagem === 4">
+                <video
+                  *ngIf="mensagem.midia.urlDownload"
+                  [src]="mensagem.midia.urlDownload"
+                  controls
+                  class="midia-video-player"
+                ></video>
+                <div class="midia-placeholder" *ngIf="!mensagem.midia.urlDownload">
+                  <span class="material-icons">videocam</span>
+                  <p>Vídeo não disponível</p>
+                </div>
+                <p class="midia-caption" *ngIf="mensagem.midia.caption">{{ mensagem.midia.caption }}</p>
+              </div>
+
+              <!-- Áudio -->
+              <div class="midia-audio" *ngIf="mensagem.tipoMensagem === 2">
+                <audio
+                  *ngIf="mensagem.midia.urlDownload"
+                  [src]="mensagem.midia.urlDownload"
+                  controls
+                  class="midia-audio-player"
+                ></audio>
+                <div class="midia-placeholder" *ngIf="!mensagem.midia.urlDownload">
+                  <span class="material-icons">mic</span>
+                  <p>Áudio não disponível</p>
+                </div>
+              </div>
+
+              <!-- Documento -->
+              <div class="midia-documento" *ngIf="mensagem.tipoMensagem === 5">
+                <a
+                  *ngIf="mensagem.midia.urlDownload"
+                  [href]="mensagem.midia.urlDownload"
+                  target="_blank"
+                  class="midia-link"
+                >
+                  <span class="material-icons">description</span>
+                  <div class="midia-info">
+                    <span class="midia-nome">{{ mensagem.midia.nomeArquivo || 'Documento' }}</span>
+                    <span class="midia-tipo">{{ mensagem.midia.mimeType }}</span>
+                  </div>
+                  <span class="material-icons">download</span>
+                </a>
+                <div class="midia-placeholder" *ngIf="!mensagem.midia.urlDownload">
+                  <span class="material-icons">description</span>
+                  <p>Documento não disponível</p>
+                </div>
+              </div>
+            </div>
+
             <span class="mensagem-horario">{{ mensagem.horario }}</span>
           </div>
         </div>
+      </div>
+
+      <!-- Loading de mensagens -->
+      <div class="chat-messages-loading" *ngIf="loadingMensagens">
+        <div class="spinner"></div>
+        <p>Carregando mensagens...</p>
       </div>
 
       <!-- Input de Mensagem -->

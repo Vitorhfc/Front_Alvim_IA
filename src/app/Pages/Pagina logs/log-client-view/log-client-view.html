@@ -1,0 +1,302 @@
+<div class="log-client-layout">
+    <div class="log-client-content">
+
+        <!-- Header -->
+        <div class="log-client-header">
+            <div class="header-info">
+                <h1 class="page-title">Logs do Cliente</h1>
+                @if (!loading && !erro) {
+                    <p class="page-subtitle">
+                        Total de logs: {{ totalItems }} | Página {{ currentPage }} de {{ totalPages }}
+                    </p>
+                }
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        @if (loading) {
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Carregando logs...</p>
+            </div>
+        }
+
+        <!-- Error State -->
+        @if (erro && !loading) {
+            <div class="error-container">
+                <div class="error-card">
+                    <span class="material-icons error-icon">error_outline</span>
+                    <div class="error-content">
+                        <strong>Erro ao carregar logs</strong>
+                        <p>{{ erro }}</p>
+                    </div>
+                </div>
+                <button class="btn-primary" (click)="recarregar()">
+                    <span class="material-icons">refresh</span>
+                    Tentar novamente
+                </button>
+            </div>
+        }
+
+        <!-- Main Content -->
+        @if (!loading && !erro) {
+            <div class="log-client-grid">
+
+                <!-- Tabela de Logs -->
+                <div class="table-card">
+                    @if (logs.length > 0) {
+                        <div class="table-wrapper">
+                            <table class="logs-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Tipo</th>
+                                        <th>Severidade</th>
+                                        <th>Origem</th>
+                                        <th>Ação</th>
+                                        <th>Mensagem</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (log of logs; track log.id) {
+                                        <tr [class.error-row]="!log.sucesso">
+                                            <td class="date-cell">
+                                                {{ log.dtaCadastro | date: 'dd/MM/yyyy HH:mm:ss' }}
+                                            </td>
+                                            <td>
+                                                <span class="badge" [ngClass]="getClasseTipoLog(log.tipo)">
+                                                    {{ getNomeTipoLog(log.tipo) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="severity-badge" [ngClass]="getClasseSeveridade(log.nivelSeveridade)">
+                                                    {{ getNomeSeveridade(log.nivelSeveridade) }}
+                                                </span>
+                                            </td>
+                                            <td>{{ log.origem || '-' }}</td>
+                                            <td class="action-cell">{{ log.acao || '-' }}</td>
+                                            <td class="message-cell">
+                                                <span [title]="log.mensagem">{{ log.mensagem }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge" [class.status-success]="log.sucesso"
+                                                    [class.status-error]="!log.sucesso">
+                                                    {{ log.sucesso ? '✓ Sucesso' : '✗ Erro' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn-details" (click)="visualizarDetalhes(log)">
+                                                    <span class="material-icons">visibility</span>
+                                                    Ver
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <!-- Empty State -->
+                    @if (logs.length === 0) {
+                        <div class="empty-state">
+                            <span class="material-icons empty-icon">inbox</span>
+                            <p>Nenhum log encontrado</p>
+                        </div>
+                    }
+
+                    <!-- Paginação -->
+                    @if (logs.length > 0 && totalPages > 1) {
+                        <div class="pagination">
+                            <button class="btn-page" (click)="paginaAnterior()" [disabled]="currentPage === 1">
+                                <span class="material-icons">chevron_left</span>
+                                Anterior
+                            </button>
+
+                            <div class="page-numbers">
+                                @for (page of [].constructor(totalPages); track $index) {
+                                    <button class="btn-page-num"
+                                        [class.active]="currentPage === $index + 1"
+                                        (click)="irParaPagina($index + 1)">
+                                        {{ $index + 1 }}
+                                    </button>
+                                }
+                            </div>
+
+                            <button class="btn-page" (click)="proximaPagina()" [disabled]="currentPage === totalPages">
+                                Próxima
+                                <span class="material-icons">chevron_right</span>
+                            </button>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div>
+
+<!-- Modal de Detalhes -->
+@if (mostrarDetalhes) {
+    <div class="modal-overlay" (click)="fecharDetalhes()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Detalhes do Log</h2>
+                <button class="btn-close" (click)="fecharDetalhes()">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+
+            @if (logSelecionado) {
+                <div class="modal-body">
+                    <!-- Informações Gerais -->
+                    <div class="detail-section">
+                        <h3>Informações Gerais</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <strong>ID do Log:</strong>
+                                <span>{{ logSelecionado.id }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Data/Hora:</strong>
+                                <span>{{ logSelecionado.dtaCadastro | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Tipo:</strong>
+                                <span class="badge" [ngClass]="getClasseTipoLog(logSelecionado.tipo)">
+                                    {{ getNomeTipoLog(logSelecionado.tipo) }}
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Severidade:</strong>
+                                <span class="severity-badge" [ngClass]="getClasseSeveridade(logSelecionado.nivelSeveridade)">
+                                    {{ getNomeSeveridade(logSelecionado.nivelSeveridade) }}
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Origem:</strong>
+                                <span>{{ logSelecionado.origem || 'N/A' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Ação:</strong>
+                                <span>{{ logSelecionado.acao || 'N/A' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Status:</strong>
+                                <span class="status-badge" [class.status-success]="logSelecionado.sucesso"
+                                    [class.status-error]="!logSelecionado.sucesso">
+                                    {{ logSelecionado.sucesso ? '✓ Sucesso' : '✗ Erro' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensagem -->
+                    @if (logSelecionado.mensagem) {
+                        <div class="detail-section">
+                            <h3>Mensagem</h3>
+                            <div class="message-box">
+                                <p>{{ logSelecionado.mensagem }}</p>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Informações HTTP -->
+                    @if (logSelecionado.endpoint || logSelecionado.metodoHttp || logSelecionado.controller || logSelecionado.metodo) {
+                        <div class="detail-section">
+                            <h3>Informações HTTP</h3>
+                            <div class="detail-grid">
+                                @if (logSelecionado.endpoint) {
+                                    <div class="detail-item">
+                                        <strong>Endpoint:</strong>
+                                        <span class="code">{{ logSelecionado.endpoint }}</span>
+                                    </div>
+                                }
+                                @if (logSelecionado.metodoHttp) {
+                                    <div class="detail-item">
+                                        <strong>Método HTTP:</strong>
+                                        <span class="code">{{ logSelecionado.metodoHttp }}</span>
+                                    </div>
+                                }
+                                @if (logSelecionado.controller) {
+                                    <div class="detail-item">
+                                        <strong>Controller:</strong>
+                                        <span>{{ logSelecionado.controller }}</span>
+                                    </div>
+                                }
+                                @if (logSelecionado.metodo) {
+                                    <div class="detail-item">
+                                        <strong>Método:</strong>
+                                        <span>{{ logSelecionado.metodo }}</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Informações Técnicas -->
+                    @if (logSelecionado.ipAddress || logSelecionado.userAgent) {
+                        <div class="detail-section">
+                            <h3>Informações Técnicas</h3>
+                            <div class="detail-grid">
+                                @if (logSelecionado.ipAddress) {
+                                    <div class="detail-item">
+                                        <strong>IP Address:</strong>
+                                        <span>{{ logSelecionado.ipAddress }}</span>
+                                    </div>
+                                }
+                                @if (logSelecionado.userAgent) {
+                                    <div class="detail-item">
+                                        <strong>User Agent:</strong>
+                                        <span>{{ logSelecionado.userAgent }}</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Descrição -->
+                    @if (logSelecionado.descricao) {
+                        <div class="detail-section">
+                            <h3>Descrição / Stack Trace</h3>
+                            <div class="description-box">
+                                <pre>{{ logSelecionado.descricao }}</pre>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Dado Antigo -->
+                    @if (logSelecionado.dadoAntigo) {
+                        <div class="detail-section">
+                            <h3>Dado Antigo</h3>
+                            <div class="payload-container">
+                                <button class="btn-copy" (click)="copiarConteudo(logSelecionado.dadoAntigo)">
+                                    <span class="material-icons">content_copy</span>
+                                    Copiar
+                                </button>
+                                <pre class="payload-json">{{ formatarJson(logSelecionado.dadoAntigo) }}</pre>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Dado Novo -->
+                    @if (logSelecionado.dadoNovo) {
+                        <div class="detail-section">
+                            <h3>Dado Novo</h3>
+                            <div class="payload-container">
+                                <button class="btn-copy" (click)="copiarConteudo(logSelecionado.dadoNovo)">
+                                    <span class="material-icons">content_copy</span>
+                                    Copiar
+                                </button>
+                                <pre class="payload-json">{{ formatarJson(logSelecionado.dadoNovo) }}</pre>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}

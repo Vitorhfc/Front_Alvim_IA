@@ -38,6 +38,21 @@ export enum StatusEntrega {
     Falha = 4
 }
 
+export interface Midia {
+    arquivoId: string | null;
+    urlDownload: string | null;
+    urlLocal: string | null;
+    nomeArquivo: string | null;
+    mimeType: string | null;
+    tamanhoBytes: number | null;
+    duracaoSegundos: number | null;
+    largura: number | null;
+    altura: number | null;
+    caption: string | null;
+    flgBaixada: boolean;
+    dtDownload: Date | null;
+}
+
 export interface Mensagem extends BaseEntidade {
     clienteId: string;
     idMensagemWhatsApp: string;
@@ -45,14 +60,23 @@ export interface Mensagem extends BaseEntidade {
     origem: OrigemMensagem;
     flgMensagemCliente: boolean;
     conteudoTexto: string;
-    midia: MidiaInfo;
-    idMensagemResposta: string;
+    midia: Midia | null;
+    idMensagemResposta: string | null;
     reacoes: Reacao[];
     dtRecebido: Date;
     dtProcessamento: Date | null;
     timestampWhatsApp: Date;
     statusEntrega: StatusEntrega;
     flgEnviadaAoN8N: boolean;
-    grupoProcessamentoId: string;
-    metadados: Record<string, any>;
+    grupoProcessamentoId: string | null;
+    metadados: Record<string, any> | null;
+}
+
+export interface MensagensClienteResponse {
+    clienteId: string;
+    clienteNome: string;
+    totalMensagens: number;
+    mensagensCliente: number;
+    mensagensResponsavel: number;
+    mensagens: Mensagem[];
 }

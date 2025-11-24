@@ -6,7 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ClientService } from '../../Service/Api/client.service';
 import { SnackbarService } from '../../Service/snackbar';
 import { Cliente, StatusConversa } from '../../Models/Entidades/Client/Cliente';
-import { Mensagem as MensagemAPI } from '../../Models/Entidades/Client/Mensagem';
+import { Mensagem as MensagemAPI, MensagensClienteResponse, TipoMensagem } from '../../Models/Entidades/Client/Mensagem';
 
 interface Conversa {
   id: string;
@@ -24,6 +24,14 @@ interface Mensagem {
   texto: string;
   horario: string;
   isUsuario: boolean;
+  tipoMensagem: TipoMensagem;
+  midia?: {
+    urlDownload: string | null;
+    nomeArquivo: string | null;
+    mimeType: string | null;
+    caption: string | null;
+  } | null;
+  idMensagemResposta?: string | null;
 }
 
 @Component({
@@ -214,8 +222,13 @@ export class ConversasComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      const mensagensAPI = await this.clientService.listarMensagensConversa(conversaId, 100);
-      this.mensagens = this.formatarMensagens(mensagensAPI);
+      const response: MensagensClienteResponse = await this.clientService.listarMensagensConversa(conversaId, 'asc');
+      this.mensagens = this.formatarMensagens(response.mensagens);
+
+      // Atualizar informações do cliente na conversa selecionada
+      if (this.conversaSelecionada) {
+        this.conversaSelecionada.cliente.totalMensagens = response.totalMensagens;
+      }
 
       // Scroll para a última mensagem
       setTimeout(() => this.scrollToBottom(), 100);
@@ -232,19 +245,41 @@ export class ConversasComponent implements OnInit, OnDestroy {
   }
 
   private formatarMensagens(mensagensAPI: MensagemAPI[]): Mensagem[] {
-    return mensagensAPI
-      .map(msg => ({
+    return mensagensAPI.map(msg => {
+      const mensagemFormatada: Mensagem = {
         id: msg.id || '',
-        texto: msg.conteudoTexto || '',
+        texto: msg.conteudoTexto || this.obterTextoTipoMensagem(msg.tipoMensagem),
         horario: this.formatarHorarioMensagem(msg.dtRecebido),
-        isUsuario: msg.flgMensagemCliente || false
-      }))
-      .sort((a, b) => {
-        // Ordenar por horário (mais antigas primeiro)
-        const idA = parseInt(a.id) || 0;
-        const idB = parseInt(b.id) || 0;
-        return idA - idB;
-      });
+        isUsuario: msg.flgMensagemCliente || false,
+        tipoMensagem: msg.tipoMensagem,
+        idMensagemResposta: msg.idMensagemResposta
+      };
+
+      // Adicionar informações de mídia se existir
+      if (msg.midia && msg.tipoMensagem !== TipoMensagem.Texto) {
+        mensagemFormatada.midia = {
+          urlDownload: msg.midia.urlDownload,
+          nomeArquivo: msg.midia.nomeArquivo,
+          mimeType: msg.midia.mimeType,
+          caption: msg.midia.caption
+        };
+      }
+
+      return mensagemFormatada;
+    });
+  }
+
+  private obterTextoTipoMensagem(tipo: TipoMensagem): string {
+    const tiposTexto: Record<number, string> = {
+      [TipoMensagem.Audio]: '🎤 Áudio',
+      [TipoMensagem.Imagem]: '📷 Imagem',
+      [TipoMensagem.Video]: '🎥 Vídeo',
+      [TipoMensagem.Documento]: '📄 Documento',
+      [TipoMensagem.Contato]: '👤 Contato',
+      [TipoMensagem.Localizacao]: '📍 Localização',
+      [TipoMensagem.Sticker]: '🎨 Sticker'
+    };
+    return tiposTexto[tipo] || 'Mensagem';
   }
 
   private formatarHorarioMensagem(data: Date): string {
@@ -323,7 +358,8 @@ export class ConversasComponent implements OnInit, OnDestroy {
         hour: '2-digit',
         minute: '2-digit'
       }),
-      isUsuario: true
+      isUsuario: true,
+      tipoMensagem: TipoMensagem.Texto
     };
 
     this.mensagens.push(novaMensagemObj);
@@ -391,7 +427,8 @@ export class ConversasComponent implements OnInit, OnDestroy {
         hour: '2-digit',
         minute: '2-digit'
       }),
-      isUsuario: false
+      isUsuario: false,
+      tipoMensagem: TipoMensagem.Texto
     };
 
     this.mensagens.push(respostaIA);

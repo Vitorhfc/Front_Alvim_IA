@@ -31,14 +31,16 @@ export class SidebarComponent implements OnInit {
 
   menuItems: MenuItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
-    { icon: 'chat', label: 'Conversas', route: '/conversas' },
+    { icon: 'chat', label: 'Conversas', route: '/conversas'},
     { icon: 'event', label: 'Agendamentos', route: '/agendamentos', disabled: true }, // Desabilitado temporariamente
     { icon: 'people', label: 'Funcionários', route: '/funcionarios', disabled: true }, // Desabilitado temporariamente
     { icon: 'analytics', label: 'Análises', route: '/analises', disabled: true }, // Desabilitado temporariamente
     { icon: 'description', label: 'Templates', route: '/templates', disabled: true }, // Desabilitado temporariamente
     { icon: 'menu_book', label: 'Base de Conhecimento', route: '/base-conhecimento' },
     { icon: 'phone', label: 'WhatsApp', route: '/whatsapp-config' },
-    { icon: 'settings', label: 'Configurações', route: '/configuracoes', disabled: true} // Desabilitado temporariamente
+    { icon: 'phone_missed', label: 'Log WhatsApp', route: '/LogWhatsapp' },
+    { icon: 'receipt_long', label: 'Logs Client', route: '/LogsClient' },
+    { icon: 'settings', label: 'Configurações', route: '/configuracoes', disabled: true } // Desabilitado temporariamente
   ];
 
   constructor(
