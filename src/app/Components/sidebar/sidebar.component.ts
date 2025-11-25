@@ -31,15 +31,15 @@ export class SidebarComponent implements OnInit {
 
   menuItems: MenuItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
-    { icon: 'chat', label: 'Conversas', route: '/conversas'},
-    { icon: 'event', label: 'Agendamentos', route: '/agendamentos' }, // Desabilitado temporariamente
-    { icon: 'people', label: 'Funcionários', route: '/funcionarios' }, // Desabilitado temporariamente
+    { icon: 'chat', label: 'Conversas', route: '/conversas', disabled: true }, // Desabilitado temporariamente
+    { icon: 'event', label: 'Agendamentos', route: '/agendamentos', disabled: true  }, // Desabilitado temporariamente
+    { icon: 'people', label: 'Funcionários', route: '/funcionarios', disabled: true }, // Desabilitado temporariamente
     { icon: 'analytics', label: 'Análises', route: '/analises', disabled: true }, // Desabilitado temporariamente
     { icon: 'description', label: 'Templates', route: '/templates', disabled: true }, // Desabilitado temporariamente
     { icon: 'menu_book', label: 'Base de Conhecimento', route: '/base-conhecimento' },
     { icon: 'phone', label: 'WhatsApp', route: '/whatsapp-config' },
-    { icon: 'phone_missed', label: 'Log WhatsApp', route: '/LogWhatsapp' },
-    { icon: 'receipt_long', label: 'Logs Client', route: '/LogsClient' },
+    { icon: 'phone_missed', label: 'Log WhatsApp', route: '/LogWhatsapp', disabled: true  },
+    { icon: 'receipt_long', label: 'Logs Client', route: '/LogsClient', disabled: true  },
     { icon: 'settings', label: 'Configurações', route: '/configuracoes', disabled: true } // Desabilitado temporariamente
   ];
 

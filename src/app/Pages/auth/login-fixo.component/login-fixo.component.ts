@@ -6,14 +6,14 @@ import { SpinnerService } from '../../../Service/Local/spinner';
 import { SnackBar } from '../../../Service/Local/snack-bar';
 
 @Component({
-  selector: 'app-login-empresa',
+  selector: 'app-login-fixo',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './login-empresa.component.html',
-  styleUrls: ['./login-empresa.component.scss']
+  templateUrl: './login-fixo.component.html',
+  styleUrls: ['./login-fixo.component.scss']
 })
-export class LoginEmpresaComponent implements OnInit {
-  empresaId: string = '';
+export class LoginFixoComponent implements OnInit {
+  empresaId: string = '691e1dab8a5dcf6219a935e4'; // ID padrão
   loading: boolean = true;
   error: string | null = null;
 
@@ -28,35 +28,14 @@ export class LoginEmpresaComponent implements OnInit {
   ngOnInit(): void {
     this.authService.logout();
 
+    // Verifica se há empresaId na rota, senão usa o ID padrão
     this.route.params.subscribe(params => {
-      this.empresaId = params['empresaId'];
-
-      if (this.empresaId) {
-        this.realizarLogin();
-      } else {
-        this.aguardarPostMessage();
+      if (params['empresaId']) {
+        this.empresaId = params['empresaId'];
       }
+      // Sempre realiza o login com o empresaId (da rota ou padrão)
+      this.realizarLogin();
     });
-  }
-
-  private aguardarPostMessage(): void {
-    // Obtém a origem da página pai que abriu o iframe
-    const allowedOrigin = document.referrer ? new URL(document.referrer).origin : window.location.origin;
-
-    window.addEventListener('message', (event) => {
-      if (event.origin !== allowedOrigin) {
-        return;
-      }
-
-      if (event.data.tipo === 'PIER_EMPRESA_ID' && event.data.empresaId) {
-        this.empresaId = event.data.empresaId;
-        this.realizarLogin();
-      }
-    });
-
-    if (window.parent !== window) {
-      window.parent.postMessage({ tipo: 'DIANA_PRONTO' }, allowedOrigin);
-    }
   }
 
   async realizarLogin(): Promise<void> {

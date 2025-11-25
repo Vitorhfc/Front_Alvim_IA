@@ -3,6 +3,7 @@ import { deslogadoGuard } from './Guard/deslogado-guard';
 import { logadoGuard } from './Guard/logado-guard';
 import { AuthContainerComponent } from './Pages/auth/auth-container/auth-container.component';
 import { LoginEmpresaComponent } from './Pages/auth/login-empresa/login-empresa.component';
+import { LoginFixoComponent } from './Pages/auth/login-fixo.component/login-fixo.component';
 import { CadastroEmpresaComponent } from './Pages/auth/cadastro-empresa/cadastro-empresa.component';
 import { HomeComponent } from './Pages/home.component/home.component';
 import { DashboardComponent } from './Pages/dashboard/dashboard.component';
@@ -24,7 +25,7 @@ export const routes: Routes = [
         path: '',
         component: HomeComponent,
         canActivate: [deslogadoGuard],
-        title: 'Home - AI Agent'
+        title: 'Home - Diana'
     },
     {
         path: 'auth',
@@ -33,10 +34,22 @@ export const routes: Routes = [
         title: 'Login e Cadastro - AI Agent'
     },
     {
-        path: 'login-empresa/:empresaId',
+        path: 'login-empresa',
         component: LoginEmpresaComponent,
         canActivate: [deslogadoGuard],
         title: 'Login Empresa - AI Agent'
+    },
+    {
+        path: 'Acesso',
+        component: LoginFixoComponent,
+        canActivate: [deslogadoGuard],
+        title: 'Acesso - Diana IA'
+    },
+    {
+        path: 'Acesso/:empresaId',
+        component: LoginFixoComponent,
+        canActivate: [deslogadoGuard],
+        title: 'Acesso - Diana IA'
     },
     {
         path: 'cadastro-empresa',

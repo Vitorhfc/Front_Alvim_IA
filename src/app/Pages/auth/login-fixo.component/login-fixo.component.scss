@@ -1,0 +1,200 @@
+.login-fixo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+
+  .login-fixo-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 48px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+
+    .brand-section {
+      margin-bottom: 40px;
+
+      .brand-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0 0 8px 0;
+      }
+
+      .brand-subtitle {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+      }
+    }
+
+    .loading-section,
+    .error-section,
+    .success-section {
+      padding: 20px 0;
+
+      h2 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 20px 0 12px 0;
+      }
+
+      p {
+        font-size: 16px;
+        color: #6b7280;
+        margin: 0;
+      }
+    }
+
+    .loading-section {
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #e5e7eb;
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+    }
+
+    .error-section {
+      .error-icon {
+        color: #ef4444;
+        margin-bottom: 16px;
+
+        svg {
+          display: inline-block;
+        }
+      }
+
+      .error-message {
+        color: #ef4444;
+        font-weight: 500;
+        margin-bottom: 24px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 24px;
+
+        .btn {
+          padding: 12px 24px;
+          border: none;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &.btn-primary {
+            background: #667eea;
+            color: white;
+
+            &:hover {
+              background: #5568d3;
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            }
+          }
+
+          &.btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+
+            &:hover {
+              background: #d1d5db;
+              transform: translateY(-2px);
+            }
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
+      }
+    }
+
+    .success-section {
+      .success-icon {
+        color: #10b981;
+        margin-bottom: 16px;
+
+        svg {
+          display: inline-block;
+        }
+      }
+    }
+
+    .footer {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+
+      p {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+
+        strong {
+          color: #1f2937;
+          font-family: 'Courier New', monospace;
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsiveness
+@media (max-width: 640px) {
+  .login-fixo-container {
+    .login-fixo-card {
+      padding: 32px 24px;
+
+      .brand-section {
+        .brand-title {
+          font-size: 28px;
+        }
+
+        .brand-subtitle {
+          font-size: 13px;
+        }
+      }
+
+      .loading-section,
+      .error-section,
+      .success-section {
+        h2 {
+          font-size: 20px;
+        }
+
+        p {
+          font-size: 14px;
+        }
+      }
+
+      .error-section {
+        .action-buttons {
+          flex-direction: column;
+
+          .btn {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
