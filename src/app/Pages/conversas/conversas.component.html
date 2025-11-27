@@ -1,0 +1,333 @@
+<div class="conversas-layout">
+
+  <main class="conversas-content" [class.conversa-selecionada]="conversaSelecionada">
+    <!-- Lista de Conversas -->
+    <aside class="conversas-list" [class.minimizada]="conversaSelecionada">
+      <div class="conversas-list-header">
+        <h2 class="conversas-title">Conversas</h2>
+        <div class="search-container">
+          <span class="material-icons search-icon">search</span>
+          <input
+            type="text"
+            placeholder="Buscar conversas..."
+            [(ngModel)]="searchTerm"
+            class="search-input"
+          />
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-list" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Carregando conversas...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-conversas" *ngIf="!loading && conversas.length === 0">
+        <span class="material-icons empty-icon">chat_bubble_outline</span>
+        <h3>Nenhum cliente encontrado</h3>
+        <p>Não há clientes cadastrados no momento</p>
+      </div>
+
+      <!-- Lista de Conversas -->
+      <div class="conversas-items" *ngIf="!loading && conversas.length > 0">
+        <!-- Empty State para busca sem resultados -->
+        <div class="empty-search" *ngIf="conversasFiltradas.length === 0">
+          <span class="material-icons">search_off</span>
+          <p>Nenhuma conversa encontrada</p>
+        </div>
+
+        <div
+          class="conversa-item"
+          *ngFor="let conversa of conversasFiltradas"
+          [class.active]="conversaSelecionada?.id === conversa.id"
+          (click)="selecionarConversa(conversa)"
+        >
+          <div class="conversa-avatar">
+            <span class="avatar-text">{{ conversa.avatar }}</span>
+            <span
+              class="status-indicator"
+              [class.online]="conversa.status === 'online'"
+              [class.offline]="conversa.status === 'offline'"
+            ></span>
+          </div>
+          <div class="conversa-details">
+            <div class="conversa-header-item">
+              <div class="conversa-nome-wrapper">
+                <span class="conversa-nome">{{ conversa.clienteNome }}</span>
+                <span
+                  class="modo-resposta-icon"
+                  [class.humano]="conversa.atendimentoHumano"
+                  [class.ia]="!conversa.atendimentoHumano"
+                  [title]="conversa.atendimentoHumano ? 'Resposta por atendente' : 'Resposta automatizada'"
+                >
+                  <span class="material-icons">{{ conversa.atendimentoHumano ? 'person' : 'smart_toy' }}</span>
+                </span>
+              </div>
+              <span class="conversa-horario">{{ conversa.horario }}</span>
+            </div>
+            <div class="conversa-footer-item">
+              <p class="conversa-ultima-mensagem">{{ conversa.ultimaMensagem }}</p>
+              <span class="conversa-badge" *ngIf="conversa.naoLidas > 0">
+                {{ conversa.naoLidas }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Área de Chat -->
+    <section class="chat-area" *ngIf="conversaSelecionada">
+      <!-- Header do Chat -->
+      <header class="chat-header">
+        <div class="chat-user-info">
+          <div class="chat-avatar">
+            <span class="avatar-text">{{ conversaSelecionada.avatar }}</span>
+            <span
+              class="status-indicator"
+              [class.online]="conversaSelecionada.status === 'online'"
+            ></span>
+          </div>
+          <div class="chat-user-details">
+            <h3 class="chat-user-nome">{{ conversaSelecionada.clienteNome }}</h3>
+            <p class="chat-user-status">
+              {{ conversaSelecionada.status === 'online' ? 'Online' : 'Offline' }}
+            </p>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button
+            class="icon-btn"
+            title="Configurações de atendimento"
+            (click)="togglePainelLateral()"
+          >
+            <span class="material-icons">settings</span>
+          </button>
+          <button
+            class="icon-btn"
+            title="Ver detalhes do cliente"
+            (click)="abrirDetalhesCliente(conversaSelecionada)"
+          >
+            <span class="material-icons">person</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Mensagens -->
+      <div class="chat-messages" *ngIf="!loadingMensagens">
+        <div
+          class="mensagem"
+          *ngFor="let mensagem of mensagens"
+          [class.mensagem-usuario]="mensagem.isUsuario"
+          [class.mensagem-ia]="!mensagem.isUsuario"
+        >
+          <div class="mensagem-conteudo">
+            <!-- Mensagem de texto -->
+            <p class="mensagem-texto" *ngIf="mensagem.texto">{{ mensagem.texto }}</p>
+
+            <!-- Mídia (Imagem, Vídeo, Documento, etc) -->
+            <div class="mensagem-midia" *ngIf="mensagem.midia">
+              <!-- Imagem -->
+              <div class="midia-imagem" *ngIf="mensagem.tipoMensagem === 3">
+                <img
+                  *ngIf="mensagem.midia.urlDownload"
+                  [src]="mensagem.midia.urlDownload"
+                  [alt]="mensagem.midia.nomeArquivo || 'Imagem'"
+                  class="midia-img"
+                />
+                <div class="midia-placeholder" *ngIf="!mensagem.midia.urlDownload">
+                  <span class="material-icons">image</span>
+                  <p>Imagem não disponível</p>
+                </div>
+                <p class="midia-caption" *ngIf="mensagem.midia.caption">{{ mensagem.midia.caption }}</p>
+              </div>
+
+              <!-- Vídeo -->
+              <div class="midia-video" *ngIf="mensagem.tipoMensagem === 4">
+                <video
+                  *ngIf="mensagem.midia.urlDownload"
+                  [src]="mensagem.midia.urlDownload"
+                  controls
+                  class="midia-video-player"
+                ></video>
+                <div class="midia-placeholder" *ngIf="!mensagem.midia.urlDownload">
+                  <span class="material-icons">videocam</span>
+                  <p>Vídeo não disponível</p>
+                </div>
+                <p class="midia-caption" *ngIf="mensagem.midia.caption">{{ mensagem.midia.caption }}</p>
+              </div>
+
+              <!-- Áudio -->
+              <div class="midia-audio" *ngIf="mensagem.tipoMensagem === 2">
+                <audio
+                  *ngIf="mensagem.midia.urlDownload"
+                  [src]="mensagem.midia.urlDownload"
+                  controls
+                  class="midia-audio-player"
+                ></audio>
+                <div class="midia-placeholder" *ngIf="!mensagem.midia.urlDownload">
+                  <span class="material-icons">mic</span>
+                  <p>Áudio não disponível</p>
+                </div>
+              </div>
+
+              <!-- Documento -->
+              <div class="midia-documento" *ngIf="mensagem.tipoMensagem === 5">
+                <a
+                  *ngIf="mensagem.midia.urlDownload"
+                  [href]="mensagem.midia.urlDownload"
+                  target="_blank"
+                  class="midia-link"
+                >
+                  <span class="material-icons">description</span>
+                  <div class="midia-info">
+                    <span class="midia-nome">{{ mensagem.midia.nomeArquivo || 'Documento' }}</span>
+                    <span class="midia-tipo">{{ mensagem.midia.mimeType }}</span>
+                  </div>
+                  <span class="material-icons">download</span>
+                </a>
+                <div class="midia-placeholder" *ngIf="!mensagem.midia.urlDownload">
+                  <span class="material-icons">description</span>
+                  <p>Documento não disponível</p>
+                </div>
+              </div>
+            </div>
+
+            <span class="mensagem-horario">{{ mensagem.horario }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading de mensagens -->
+      <div class="chat-messages-loading" *ngIf="loadingMensagens">
+        <div class="spinner"></div>
+        <p>Carregando mensagens...</p>
+      </div>
+
+      <!-- Input de Mensagem -->
+      <footer class="chat-input-area">
+        <input
+          type="text"
+          placeholder="Digite sua mensagem..."
+          [(ngModel)]="novaMensagem"
+          (keyup.enter)="enviarMensagem()"
+          class="chat-input"
+        />
+        <button
+          class="send-btn"
+          (click)="enviarMensagem()"
+          [disabled]="!novaMensagem.trim()"
+        >
+          <span class="material-icons">send</span>
+        </button>
+      </footer>
+    </section>
+
+    <!-- Info do Cliente -->
+    <aside class="cliente-info" *ngIf="conversaSelecionada">
+      <div class="cliente-info-header">
+        <div class="cliente-avatar-large">
+          <span class="avatar-text">{{ conversaSelecionada.avatar }}</span>
+        </div>
+        <h3 class="cliente-nome">{{ conversaSelecionada.clienteNome }}</h3>
+        <p class="cliente-telefone">{{ conversaSelecionada.cliente.numero || 'Não informado' }}</p>
+
+        <button
+          class="btn-ver-detalhes"
+          (click)="abrirDetalhesCliente(conversaSelecionada)"
+        >
+          <span class="material-icons">open_in_new</span>
+          Ver Detalhes Completos
+        </button>
+      </div>
+
+      <div class="cliente-info-section">
+        <h4 class="section-title">Email</h4>
+        <p class="section-content">{{ conversaSelecionada.cliente.email || 'Não informado' }}</p>
+      </div>
+
+      <div class="cliente-info-section">
+        <h4 class="section-title">CPF</h4>
+        <p class="section-content">{{ conversaSelecionada.cliente.cpf || 'Não informado' }}</p>
+      </div>
+
+      <div class="cliente-info-section">
+        <h4 class="section-title">Última interação</h4>
+        <p class="section-content">{{ conversaSelecionada.horario }}</p>
+      </div>
+
+      <div class="cliente-info-section">
+        <h4 class="section-title">Status</h4>
+        <div class="status-badge" [class.online]="conversaSelecionada.status === 'online'">
+          <span class="status-dot"></span>
+          {{ conversaSelecionada.status === 'online' ? 'Ativo' : 'Inativo' }}
+        </div>
+      </div>
+
+      <div class="cliente-info-section">
+        <h4 class="section-title">Total de Mensagens</h4>
+        <p class="section-content">{{ conversaSelecionada.cliente.totalMensagens || 0 }}</p>
+      </div>
+    </aside>
+
+    <!-- Empty State -->
+    <section class="empty-state" *ngIf="!conversaSelecionada && !loading">
+      <span class="material-icons empty-icon">chat_bubble_outline</span>
+      <h3>Nenhuma conversa selecionada</h3>
+      <p>Selecione uma conversa na lista para começar</p>
+    </section>
+  </main>
+
+  <!-- Painel Lateral de Configurações -->
+  <aside class="painel-lateral" *ngIf="conversaSelecionada" [class.aberto]="painelLateralAberto">
+    <div class="painel-lateral-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn-close" (click)="fecharPainelLateral()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="painel-lateral-content">
+      <div class="config-section">
+        <h4 class="config-title">Modo de Atendimento</h4>
+        <p class="config-description">
+          Defina como as mensagens deste cliente serão respondidas
+        </p>
+
+        <div class="config-option">
+          <div class="switch-container">
+            <label class="switch">
+              <input
+                type="checkbox"
+                [checked]="conversaSelecionada.atendimentoHumano"
+                (change)="alternarModoResposta()"
+                [disabled]="alterandoModoResposta"
+              />
+              <span class="slider"></span>
+            </label>
+            <div class="switch-label">
+              <div class="modo-info">
+                <span class="material-icons modo-icon" [class.ativo]="conversaSelecionada.atendimentoHumano">
+                  {{ conversaSelecionada.atendimentoHumano ? 'person' : 'smart_toy' }}
+                </span>
+                <div class="modo-texto">
+                  <strong>{{ conversaSelecionada.atendimentoHumano ? 'Atendente Humano' : 'Resposta Automatizada (IA)' }}</strong>
+                  <p>{{ conversaSelecionada.atendimentoHumano ? 'Mensagens serão respondidas manualmente' : 'IA responderá automaticamente' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="loading-switch" *ngIf="alterandoModoResposta">
+            <div class="spinner-small"></div>
+            <span>Alterando...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Overlay -->
+  <div class="painel-overlay" *ngIf="painelLateralAberto" (click)="fecharPainelLateral()"></div>
+</div>

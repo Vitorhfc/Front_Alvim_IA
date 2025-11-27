@@ -1,0 +1,25 @@
+<div class="app-container">
+  @if (isAutenticado()) {
+    <aside
+      class="sidebar-wrapper"
+      [class.collapsed]="sidebarCollapsed$ | async"
+      [class.visible]="(sidebarMode$ | async) === 'visible'"
+      [class.hidden]="(sidebarMode$ | async) === 'hidden'"
+    >
+      <app-sidebar />
+    </aside>
+
+    <div
+      class="sidebar-overlay"
+      [class.active]="(sidebarMode$ | async) === 'visible' && !(sidebarCollapsed$ | async)"
+      (click)="hideSidebar()"
+    ></div>
+  }
+
+  <main class="main-content" [class.full-width]="!isAutenticado()">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<app-spinner />
+<app-snackbar />

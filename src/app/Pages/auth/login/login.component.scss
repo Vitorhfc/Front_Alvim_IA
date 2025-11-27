@@ -1,0 +1,197 @@
+.login-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary, #2c3e50);
+  }
+
+  input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    min-height: 3rem;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color, #007bff);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    &:disabled {
+      background-color: var(--disabled-bg, #f5f5f5);
+      cursor: not-allowed;
+    }
+  }
+
+  mat-radio-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.25rem;
+    flex-wrap: wrap;
+  }
+
+  mat-radio-button {
+    font-size: 0.875rem;
+  }
+
+  &.centralizar {
+    align-items: center;
+
+    mat-radio-group {
+      justify-content: center;
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+    }
+  }
+}
+
+.btn-primary {
+  padding: 0.875rem 1.5rem;
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 3rem;
+  width: 100%;
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-hover, #0056b3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: var(--disabled-bg, #cccccc);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+  }
+}
+
+.forgot-password {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--primary-color, #007bff);
+  text-decoration: none;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: var(--primary-hover, #0056b3);
+    text-decoration: underline;
+  }
+}
+
+.switch-form {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6c757d);
+  }
+
+  a {
+    color: var(--primary-color, #007bff);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: var(--primary-hover, #0056b3);
+      text-decoration: underline;
+    }
+  }
+}
+
+.error-message {
+  padding: 0.875rem 1rem;
+  background-color: #fee;
+  color: #c33;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #c33;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Estilos para dispositivos móveis pequenos
+@media (max-width: 480px) {
+  .auth-form {
+    gap: 1.25rem;
+  }
+
+  .form-group {
+    label {
+      font-size: 0.8125rem;
+    }
+
+    input {
+      font-size: 0.9375rem;
+      padding: 0.625rem 0.875rem;
+    }
+
+    mat-radio-button {
+      font-size: 0.8125rem;
+    }
+  }
+
+  .btn-primary {
+    font-size: 0.9375rem;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .forgot-password {
+    font-size: 0.8125rem;
+  }
+
+  .switch-form {
+    p {
+      font-size: 0.8125rem;
+    }
+  }
+}

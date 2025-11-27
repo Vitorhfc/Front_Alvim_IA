@@ -1,0 +1,233 @@
+<div class="log-waha-layout">
+    <div class="log-waha-content">
+
+        <!-- Header -->
+        <div class="log-waha-header">
+            <div class="header-info">
+                <h1 class="page-title">Logs WAHA</h1>
+                <p class="page-subtitle" *ngIf="!loading && !erro">
+                    Total de logs: {{ totalItems }} | Página {{ currentPage }} de {{ totalPages }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-container" *ngIf="loading">
+            <div class="spinner"></div>
+            <p>Carregando logs...</p>
+        </div>
+
+        <!-- Error State -->
+        <div class="error-container" *ngIf="erro && !loading">
+            <div class="error-card">
+                <span class="material-icons error-icon">error_outline</span>
+                <div class="error-content">
+                    <strong>Erro ao carregar logs</strong>
+                    <p>{{ erro }}</p>
+                </div>
+            </div>
+            <button class="btn-primary" (click)="recarregar()">
+                <span class="material-icons">refresh</span>
+                Tentar novamente
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="log-waha-grid" *ngIf="!loading && !erro">
+
+            <!-- Tabela de Logs -->
+            <div class="table-card">
+                <div class="table-wrapper" *ngIf="logs.length > 0">
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Tipo Evento</th>
+                                <th>Origem</th>
+                                <th>Ação</th>
+                                <th>Status</th>
+                                <th>Telefone Origem</th>
+                                <th>Session ID</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let log of logs" [class.error-row]="!log.sucesso">
+                                <td class="date-cell">
+                                    {{ log.dtaCadastro | date: 'dd/MM/yyyy HH:mm:ss' }}
+                                </td>
+                                <td>
+                                    <span class="badge" [ngClass]="getClasseTipoEvento(log.tipoEvento)">
+                                        {{ log.tipoEvento }}
+                                    </span>
+                                </td>
+                                <td>{{ log.origem }}</td>
+                                <td class="action-cell">{{ log.acao }}</td>
+                                <td>
+                                    <span class="status-badge" [class.status-success]="log.sucesso"
+                                        [class.status-error]="!log.sucesso">
+                                        {{ log.sucesso ? '✓ Sucesso' : '✗ Erro' }}
+                                    </span>
+                                </td>
+                                <td>{{ log.telefoneOrigem || '-' }}</td>
+                                <td class="session-cell">{{ log.sessionId || '-' }}</td>
+                                <td>
+                                    <button class="btn-details" (click)="visualizarDetalhes(log)">
+                                        <span class="material-icons">visibility</span>
+                                        Ver
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" *ngIf="logs.length === 0">
+                    <span class="material-icons empty-icon">inbox</span>
+                    <p>Nenhum log encontrado</p>
+                </div>
+
+                <!-- Paginação -->
+                <div class="pagination" *ngIf="logs.length > 0 && totalPages > 1">
+                    <button class="btn-page" (click)="paginaAnterior()" [disabled]="currentPage === 1">
+                        <span class="material-icons">chevron_left</span>
+                        Anterior
+                    </button>
+
+                    <div class="page-numbers">
+                        <button *ngFor="let page of [].constructor(totalPages); let i = index" class="btn-page-num"
+                            [class.active]="currentPage === i + 1" (click)="irParaPagina(i + 1)">
+                            {{ i + 1 }}
+                        </button>
+                    </div>
+
+                    <button class="btn-page" (click)="proximaPagina()" [disabled]="currentPage === totalPages">
+                        Próxima
+                        <span class="material-icons">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal de Detalhes -->
+<div class="modal-overlay" *ngIf="mostrarDetalhes" (click)="fecharDetalhes()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Detalhes do Log</h2>
+            <button class="btn-close" (click)="fecharDetalhes()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="modal-body" *ngIf="logSelecionado">
+            <!-- Informações Gerais -->
+            <div class="detail-section">
+                <h3>Informações Gerais</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <strong>ID do Log:</strong>
+                        <span>{{ logSelecionado.idLog }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Data/Hora:</strong>
+                        <span>{{ logSelecionado.dtaCadastro | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Tipo de Evento:</strong>
+                        <span class="badge" [ngClass]="getClasseTipoEvento(logSelecionado.tipoEvento)">
+                            {{ logSelecionado.tipoEvento }}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Origem:</strong>
+                        <span>{{ logSelecionado.origem }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Ação:</strong>
+                        <span>{{ logSelecionado.acao }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Status:</strong>
+                        <span class="status-badge" [class.status-success]="logSelecionado.sucesso"
+                            [class.status-error]="!logSelecionado.sucesso">
+                            {{ logSelecionado.sucesso ? '✓ Sucesso' : '✗ Erro' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações de Comunicação -->
+            <div class="detail-section"
+                *ngIf="logSelecionado.sessionId || logSelecionado.telefoneOrigem || logSelecionado.telefoneDestino">
+                <h3>Informações de Comunicação</h3>
+                <div class="detail-grid">
+                    <div class="detail-item" *ngIf="logSelecionado.sessionId">
+                        <strong>Session ID:</strong>
+                        <span class="code">{{ logSelecionado.sessionId }}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="logSelecionado.telefoneOrigem">
+                        <strong>Telefone Origem:</strong>
+                        <span>{{ logSelecionado.telefoneOrigem }}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="logSelecionado.telefoneDestino">
+                        <strong>Telefone Destino:</strong>
+                        <span>{{ logSelecionado.telefoneDestino }}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="logSelecionado.messageId">
+                        <strong>Message ID:</strong>
+                        <span class="code">{{ logSelecionado.messageId }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações Técnicas -->
+            <div class="detail-section" *ngIf="logSelecionado.ipAddress || logSelecionado.userAgent">
+                <h3>Informações Técnicas</h3>
+                <div class="detail-grid">
+                    <div class="detail-item" *ngIf="logSelecionado.ipAddress">
+                        <strong>IP Address:</strong>
+                        <span>{{ logSelecionado.ipAddress }}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="logSelecionado.userAgent">
+                        <strong>User Agent:</strong>
+                        <span>{{ logSelecionado.userAgent }}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="logSelecionado.tempoProcessamentoMs">
+                        <strong>Tempo de Processamento:</strong>
+                        <span>{{ logSelecionado.tempoProcessamentoMs }} ms</span>
+                    </div>
+                    <div class="detail-item" *ngIf="logSelecionado.statusHttp">
+                        <strong>Status HTTP:</strong>
+                        <span>{{ logSelecionado.statusHttp }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações de Erro -->
+            <div class="detail-section" *ngIf="!logSelecionado.sucesso">
+                <h3>Informações de Erro</h3>
+                <div class="error-details">
+                    <div class="detail-item" *ngIf="logSelecionado.mensagemErro">
+                        <strong>Mensagem de Erro:</strong>
+                        <p class="error-text">{{ logSelecionado.mensagemErro }}</p>
+                    </div>
+                    <div class="detail-item" *ngIf="logSelecionado.stackTrace">
+                        <strong>Stack Trace:</strong>
+                        <pre class="stack-trace">{{ logSelecionado.stackTrace }}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payload -->
+            <div class="detail-section">
+                <h3>Payload</h3>
+                <app-json-viewer [content]="logSelecionado.payload" [showCopyButton]="true"></app-json-viewer>
+            </div>
+        </div>
+    </div>
+</div>

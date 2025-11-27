@@ -1,0 +1,290 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use "@angular/material" as mat;
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap");
+@import "./app/Scss/variable.scss";
+
+html {
+  font-size: 14px; // Reduz o tamanho base de 16px para 14px (87.5%)
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette
+      ),
+      typography: Roboto,
+      density: 0
+    )
+  );
+}
+
+body {
+  font-family: "Comfortaa", sans-serif;
+  font-size: 0.875rem; // 14px base (equivalente a 14px no html de 16px)
+
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--bg-gradient);
+  color: var(--mat-sys-on-surface);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
+
+// Dark theme support
+.dark-theme {
+  color-scheme: dark;
+}
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+.FonteRoboto {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+// Removido duplicado - definição de body já existe acima
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, hsl(var(--primary)), hsl(var(--accent)));
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, hsl(221, 83%, 60%), hsl(262, 83%, 65%));
+  box-shadow: 0 0 10px hsla(var(--primary), 0.5);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--accent)) transparent;
+}
+
+.dark {
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, hsl(var(--accent)), hsl(var(--primary)));
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, hsl(262, 83%, 65%), hsl(221, 83%, 60%));
+    box-shadow: 0 0 12px hsla(var(--accent), 0.6);
+  }
+
+  scrollbar-color: hsl(var(--accent)) transparent;
+}
+
+// ==================== NGX-CHARTS STYLES ====================
+
+// Customizações globais para os gráficos
+.ngx-charts {
+  text {
+    fill: var(--text-primary) !important;
+    font-size: var(--font-size-xs) !important;
+  }
+
+  .gridline-path {
+    stroke: var(--border-color) !important;
+  }
+
+  .tick {
+    text {
+      fill: var(--text-secondary) !important;
+      font-size: var(--font-size-xs) !important;
+    }
+  }
+
+  .legend-label {
+    fill: var(--text-primary) !important;
+    font-size: var(--font-size-sm) !important;
+  }
+
+  .tooltip-anchor {
+    fill: var(--card-bg) !important;
+    stroke: var(--border-color) !important;
+  }
+
+  .advanced-pie-legend {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// ==================== AJUSTES GLOBAIS DE TAMANHO ====================
+
+// Reduz ícones do Angular Material
+.mat-icon {
+  font-size: 1.25rem !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+}
+
+// Ajusta tamanhos de cards
+.mat-mdc-card {
+  padding: 1rem !important;
+}
+
+// Ajusta tabelas
+table {
+  font-size: var(--font-size-sm);
+
+  th {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    padding: 0.5rem !important;
+  }
+
+  td {
+    font-size: var(--font-size-sm);
+    padding: 0.5rem !important;
+  }
+}
+
+// Ajusta tooltips
+.mat-mdc-tooltip {
+  font-size: var(--font-size-xs) !important;
+}
+
+// Ajusta snackbars
+.mat-mdc-snack-bar-container {
+  font-size: var(--font-size-sm) !important;
+}
+
+// Ajusta dialogs
+.mat-mdc-dialog-title {
+  font-size: var(--font-size-xl) !important;
+}
+
+.mat-mdc-dialog-content {
+  font-size: var(--font-size-base) !important;
+}
+
+// Ajusta menus
+.mat-mdc-menu-content {
+  font-size: var(--font-size-sm) !important;
+}
+
+.mat-mdc-menu-item {
+  font-size: var(--font-size-sm) !important;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+}
+
+// Ajusta chips
+.mat-mdc-chip {
+  font-size: var(--font-size-xs) !important;
+  min-height: 1.75rem !important;
+}
+
+// Ajusta badges
+.mat-badge-content {
+  font-size: var(--font-size-xs) !important;
+}
+
+// Ajusta listas
+.mat-mdc-list-item {
+  font-size: var(--font-size-sm) !important;
+}
+
+// ==================== AJUSTES DE FORMULÁRIOS ====================
+
+// Form fields
+.mat-mdc-form-field {
+  .mat-mdc-form-field-label {
+    font-size: var(--font-size-sm) !important;
+  }
+
+  .mat-mdc-input-element {
+    font-size: var(--font-size-base) !important;
+  }
+
+  .mat-mdc-form-field-hint,
+  .mat-mdc-form-field-error {
+    font-size: var(--font-size-xs) !important;
+  }
+}
+
+// Select
+.mat-mdc-select {
+  font-size: var(--font-size-base) !important;
+
+  .mat-mdc-select-value {
+    font-size: var(--font-size-base) !important;
+  }
+}
+
+.mat-mdc-option {
+  font-size: var(--font-size-sm) !important;
+  min-height: 2.5rem !important;
+  height: auto !important;
+}
+
+// Checkbox e Radio
+.mat-mdc-checkbox,
+.mat-mdc-radio-button {
+  font-size: var(--font-size-sm) !important;
+
+  .mat-mdc-checkbox-label,
+  .mat-mdc-radio-label-content {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// Slide toggle
+.mat-mdc-slide-toggle {
+  .mat-mdc-slide-toggle-label {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// Datepicker
+.mat-datepicker-content {
+  font-size: var(--font-size-sm) !important;
+
+  .mat-calendar {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// Stepper
+.mat-step-header {
+  .mat-step-label {
+    font-size: var(--font-size-sm) !important;
+  }
+}
+
+// Tabs
+.mat-mdc-tab {
+  font-size: var(--font-size-sm) !important;
+  min-width: 120px !important;
+  padding: 0.5rem 1rem !important;
+}
+
+// Expansion panel
+.mat-expansion-panel-header {
+  font-size: var(--font-size-base) !important;
+  height: 3rem !important;
+}
+
+.mat-expansion-panel-body {
+  font-size: var(--font-size-sm) !important;
+}

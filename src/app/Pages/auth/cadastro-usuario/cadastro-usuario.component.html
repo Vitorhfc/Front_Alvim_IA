@@ -1,0 +1,65 @@
+<div class="cadastro-container">
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <form (ngSubmit)="onCadastro()" class="auth-form cadastro-form">
+    <div class="form-group">
+      <label for="cadastro-nome">Nome Completo *</label>
+      <input type="text" id="cadastro-nome" [(ngModel)]="cadastroModel.nome" name="nome" placeholder="Seu nome completo"
+        [disabled]="loading" required autocomplete="name">
+    </div>
+
+    <div class="form-group">
+      <label for="cadastro-email">E-mail *</label>
+      <input type="email" id="cadastro-email" [(ngModel)]="cadastroModel.email" name="email" placeholder="seu@email.com"
+        [disabled]="loading" required autocomplete="email">
+    </div>
+
+    <div class="form-group">
+      <label for="cadastro-cpf">CPF *</label>
+      <input type="text" id="cadastro-cpf" [(ngModel)]="cadastroModel.cpf" name="cpf" placeholder="000.000.000-00"
+        (input)="formatCPF($event)" maxlength="14" [disabled]="loading" required>
+    </div>
+
+    <div class="form-group">
+      <label for="cadastro-celular">Celular *</label>
+      <input type="text" id="cadastro-celular" [(ngModel)]="cadastroModel.celular" name="celular"
+        placeholder="(00) 00000-0000" (input)="formatCelular($event)" maxlength="15" [disabled]="loading" required
+        autocomplete="tel">
+    </div>
+
+    <div class="form-group">
+      <label for="cadastro-nascimento">Data de Nascimento *</label>
+      <input type="date" id="cadastro-nascimento" [(ngModel)]="cadastroModel.dtaNascimento" name="dtaNascimento"
+        [disabled]="loading" required autocomplete="bday">
+    </div>
+
+    <div class="form-group">
+      <label for="cadastro-senha">Senha *</label>
+      <input type="password" id="cadastro-senha" [(ngModel)]="cadastroModel.senha" name="senha"
+        placeholder="Mínimo 6 caracteres" [disabled]="loading" required autocomplete="new-password">
+    </div>
+
+    <div class="terms-container">
+      <input type="checkbox" id="terms-checkbox" [(ngModel)]="termsAccepted" name="aceitaTermos" [disabled]="loading"
+        required>
+      <label for="terms-checkbox" class="terms">
+        Ao criar sua conta, você concorda com nossos
+        <a href="#" target="_blank">Termos de Uso</a> e
+        <a href="#" target="_blank">Política de Privacidade</a>
+      </label>
+    </div>
+    <button type="submit" class="btn-primary" [disabled]="loading">
+      <span *ngIf="!loading">Criar Conta</span>
+      <span *ngIf="loading">Criando conta...</span>
+    </button>
+
+
+    <div class="switch-form">
+      <p>Já tem uma conta?
+        <a href="#" (click)="onSwitchToLogin(); $event.preventDefault()">Fazer login</a>
+      </p>
+    </div>
+  </form>
+</div>

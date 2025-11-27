@@ -1,0 +1,197 @@
+<div class="dashboard-layout">
+
+  <main class="dashboard-content">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-info">
+        <h1 class="page-title">Dashboard - Diana IA</h1>
+        <p class="page-subtitle">Visão geral do seu agente de IA</p>
+      </div>
+    </header>
+
+    <!-- Descrição do Projeto -->
+    <section class="project-description">
+      <div class="description-card">
+        <div class="description-icon">
+          <span class="material-icons">smart_toy</span>
+        </div>
+        <div class="description-content">
+          <h2>Sobre a Diana IA</h2>
+          <p>
+            A <strong>Diana IA</strong> é uma plataforma inteligente de atendimento ao cliente que utiliza
+            inteligência artificial avançada para automatizar conversas, responder perguntas e fornecer
+            suporte personalizado 24/7. Nossa solução integra-se com WhatsApp e outros canais de comunicação,
+            proporcionando uma experiência fluida e eficiente tanto para sua equipe quanto para seus clientes.
+          </p>
+          <div class="key-features">
+            <div class="feature-item">
+              <span class="material-icons">check_circle</span>
+              <span>Atendimento automático inteligente</span>
+            </div>
+            <div class="feature-item">
+              <span class="material-icons">check_circle</span>
+              <span>Análise de sentimentos em tempo real</span>
+            </div>
+            <div class="feature-item">
+              <span class="material-icons">check_circle</span>
+              <span>Gestão completa de conversas e clientes</span>
+            </div>
+            <div class="feature-item">
+              <span class="material-icons">check_circle</span>
+              <span>Métricas e relatórios detalhados</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Carregando dados...</p>
+      </div>
+    }
+
+    <!-- Content -->
+    @if (!loading) {
+      <div class="dashboard-grid">
+        <!-- Métricas -->
+        <section class="metrics-row">
+          @for (metric of metrics; track metric.title) {
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-title">{{ metric.title }}</span>
+                <div class="metric-icon" [style.background]="metric.iconColor">
+                  <span class="material-icons">{{ metric.icon }}</span>
+                </div>
+              </div>
+              <div class="metric-value">{{ metric.value }}</div>
+              <div class="metric-change" [class.positive]="metric.changePositive" [class.negative]="!metric.changePositive">
+                <span class="material-icons change-icon">
+                  {{ metric.changePositive ? 'trending_up' : 'trending_down' }}
+                </span>
+                {{ metric.change }}
+              </div>
+            </div>
+          }
+        </section>
+
+        <!-- Gráficos -->
+        <section class="charts-row">
+          <!-- Volume de Mensagens -->
+          <div class="chart-card">
+            <h3 class="card-title">Volume de Mensagens - Últimos 7 Dias</h3>
+            <div class="chart-container">
+              @if (volumeMensagensData.length > 0) {
+                <ngx-charts-line-chart
+                  [results]="[{name: 'Mensagens', series: volumeMensagensData}]"
+                  [xAxis]="true"
+                  [yAxis]="true"
+                  [showXAxisLabel]="true"
+                  [showYAxisLabel]="true"
+                  [xAxisLabel]="'Data'"
+                  [yAxisLabel]="'Mensagens'"
+                  [autoScale]="true"
+                  [timeline]="false"
+                  [scheme]="colorScheme">
+                </ngx-charts-line-chart>
+              } @else {
+                <div class="chart-placeholder">
+                  <span class="material-icons chart-icon">show_chart</span>
+                  <p>Nenhum dado disponível</p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Categorias de Perguntas -->
+          <div class="chart-card">
+            <h3 class="card-title">Categorias de Perguntas</h3>
+            <div class="chart-container">
+              @if (categoriasData.length > 0 && categoriasData[0].value > 0) {
+                <ngx-charts-bar-vertical
+                  [results]="categoriasData"
+                  [xAxis]="true"
+                  [yAxis]="true"
+                  [showXAxisLabel]="true"
+                  [showYAxisLabel]="true"
+                  [xAxisLabel]="'Categoria'"
+                  [yAxisLabel]="'Quantidade'"
+                  [gradient]="false"
+                  [scheme]="colorScheme">
+                </ngx-charts-bar-vertical>
+              } @else {
+                <div class="chart-placeholder">
+                  <span class="material-icons chart-icon">bar_chart</span>
+                  <p>Nenhum dado disponível</p>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- Conversas e Sentimentos -->
+        <section class="info-row">
+          <!-- Últimas Conversas -->
+          <div class="info-card conversas-card">
+            <div class="card-header">
+              <h3 class="card-title">Últimas Conversas</h3>
+              <span class="material-icons card-icon">forum</span>
+            </div>
+            <div class="conversas-list">
+              @if (conversasRecentes.length > 0) {
+                @for (conversa of conversasRecentes; track conversa.id) {
+                  <div class="conversa-item" [attr.data-status]="conversa.status">
+                    <div class="conversa-avatar">
+                      <div class="avatar-circle">
+                        <span class="material-icons">person</span>
+                      </div>
+                      <div class="status-indicator" [style.background]="getStatusColor(conversa.status)"></div>
+                    </div>
+                    <div class="conversa-info">
+                      <div class="conversa-header">
+                        <span class="conversa-nome">{{ conversa.clienteNome }}</span>
+                        <span class="conversa-status" [style.background]="getStatusColor(conversa.status) + '20'" [style.color]="getStatusColor(conversa.status)">
+                          <span class="status-dot" [style.background]="getStatusColor(conversa.status)"></span>
+                          {{ conversa.status }}
+                        </span>
+                      </div>
+                      <p class="conversa-mensagem">{{ conversa.ultimaMensagem }}</p>
+                    </div>
+                  </div>
+                }
+              } @else {
+                <div class="chart-placeholder">
+                  <span class="material-icons chart-icon">forum</span>
+                  <p>Nenhuma conversa recente</p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Análise de Sentimentos -->
+          <div class="info-card sentimentos-card">
+            <h3 class="card-title">Análise de Sentimentos</h3>
+            <div class="sentimentos-chart">
+              @if (sentimentosChartData.length > 0 && (sentimentosData.positivo + sentimentosData.neutro + sentimentosData.negativo) > 0) {
+                <ngx-charts-pie-chart
+                  [results]="sentimentosChartData"
+                  [legend]="true"
+                  [labels]="true"
+                  [doughnut]="false"
+                  [scheme]="sentimentosColorScheme">
+                </ngx-charts-pie-chart>
+              } @else {
+                <div class="pie-chart-placeholder">
+                  <span class="material-icons chart-icon">pie_chart</span>
+                  <p>Nenhum dado disponível</p>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+      </div>
+    }
+  </main>
+</div>

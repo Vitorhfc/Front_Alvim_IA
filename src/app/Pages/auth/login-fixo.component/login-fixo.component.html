@@ -1,0 +1,50 @@
+<div class="login-fixo-container">
+  <div class="login-fixo-card">
+    <!-- Logo/Branding -->
+    <div class="brand-section">
+      <h1 class="brand-title">Diana IA</h1>
+      <p class="brand-subtitle">Atendimento Inteligente ao Cliente</p>
+    </div>
+
+    <!-- Error State -->
+    @if (error) {
+      <div class="error-section">
+        <div class="error-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h2>Erro na Autenticação</h2>
+        <p class="error-message">{{ error }}</p>
+
+        <div class="action-buttons">
+          <button class="btn btn-primary" (click)="tentarNovamente()">
+            Tentar Novamente
+          </button>
+          <button class="btn btn-secondary" (click)="voltarParaHome()">
+            Voltar para Home
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Success State (briefly shown before redirect) -->
+    @if (!loading && !error) {
+      <div class="success-section">
+        <div class="success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <h2>Login realizado com sucesso!</h2>
+        <p>Redirecionando para o dashboard...</p>
+      </div>
+    }
+
+  </div>
+</div>

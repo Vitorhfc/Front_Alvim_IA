@@ -1,0 +1,140 @@
+<div class="config-layout">
+
+  <main class="config-content">
+    <header class="page-header">
+      <div class="header-info">
+        <h1 class="page-title">Configurações</h1>
+        <p class="page-subtitle">Gerencie as configurações do sistema</p>
+      </div>
+      <button class="btn-primary" (click)="salvarConfiguracoes()">
+        <span class="material-icons">save</span>
+        Salvar Alterações
+      </button>
+    </header>
+
+    <div class="config-container" *ngIf="!loading">
+      <!-- Tabs laterais -->
+      <aside class="config-tabs">
+        <button
+          *ngFor="let tab of tabs"
+          class="tab-btn"
+          [class.active]="activeTab === tab.id"
+          (click)="setActiveTab(tab.id)"
+        >
+          <span class="material-icons">{{ tab.icon }}</span>
+          <span>{{ tab.label }}</span>
+        </button>
+      </aside>
+
+      <!-- Conteúdo das tabs -->
+      <section class="config-panel">
+        <!-- TAB: Geral -->
+        <div class="tab-content" *ngIf="activeTab === 'geral'">
+          <h2 class="section-title">Configurações Gerais</h2>
+
+          <div class="form-group">
+            <label>Nome da Empresa</label>
+            <input type="text" [(ngModel)]="configGeral.nomeEmpresa" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label>E-mail de Contato</label>
+            <input type="email" [(ngModel)]="configGeral.email" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label>Telefone</label>
+            <input type="tel" [(ngModel)]="configGeral.telefone" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label>Horário de Atendimento</label>
+            <input type="text" [(ngModel)]="configGeral.horarioAtendimento" class="form-input" />
+          </div>
+        </div>
+
+        <!-- TAB: IA -->
+        <div class="tab-content" *ngIf="activeTab === 'ia'">
+          <h2 class="section-title">Configuração da IA</h2>
+
+          <div class="form-group">
+            <label>Modelo de IA</label>
+            <select [(ngModel)]="configIA.modelo" class="form-select">
+              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+              <option value="gpt-4">GPT-4</option>
+              <option value="gpt-4-turbo">GPT-4 Turbo</option>
+            </select>
+            <small class="form-hint">Modelos mais avançados geram respostas melhores mas custam mais</small>
+          </div>
+
+          <div class="form-group">
+            <label>Temperatura ({{ configIA.temperatura }})</label>
+            <input
+              type="range"
+              [(ngModel)]="configIA.temperatura"
+              min="0"
+              max="1"
+              step="0.1"
+              class="form-range"
+            />
+            <small class="form-hint">Controla a criatividade das respostas (0 = conservador, 1 = criativo)</small>
+          </div>
+
+          <div class="form-group">
+            <label>Máximo de Tokens</label>
+            <input type="number" [(ngModel)]="configIA.maxTokens" class="form-input" />
+            <small class="form-hint">Limita o tamanho das respostas geradas</small>
+          </div>
+
+          <div class="form-group">
+            <label>Contexto Histórico (mensagens)</label>
+            <input type="number" [(ngModel)]="configIA.contextoHistorico" class="form-input" />
+            <small class="form-hint">Quantas mensagens anteriores a IA deve considerar</small>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="configIA.respostasAutomaticas" />
+              <span>Habilitar respostas automáticas</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- TAB: Integrações -->
+        <div class="tab-content" *ngIf="activeTab === 'integrações'">
+          <h2 class="section-title">Integrações</h2>
+          <div class="placeholder-content">
+            <span class="material-icons">extension</span>
+            <p>Configure integrações com WhatsApp, E-mail e outras plataformas</p>
+            <small>TODO: Implementar gerenciamento de integrações</small>
+          </div>
+        </div>
+
+        <!-- TAB: Notificações -->
+        <div class="tab-content" *ngIf="activeTab === 'notificações'">
+          <h2 class="section-title">Notificações</h2>
+          <div class="placeholder-content">
+            <span class="material-icons">notifications</span>
+            <p>Configure quando e como receber notificações</p>
+            <small>TODO: Implementar preferências de notificações</small>
+          </div>
+        </div>
+
+        <!-- TAB: Segurança -->
+        <div class="tab-content" *ngIf="activeTab === 'segurança'">
+          <h2 class="section-title">Segurança</h2>
+          <div class="placeholder-content">
+            <span class="material-icons">security</span>
+            <p>Gerencie configurações de segurança e acesso</p>
+            <small>TODO: Implementar configurações de segurança</small>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="loading-container" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Carregando configurações...</p>
+    </div>
+  </main>
+</div>

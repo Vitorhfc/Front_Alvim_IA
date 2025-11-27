@@ -1,0 +1,219 @@
+@use '../../../Scss/variable.scss' as *;
+
+// ==================== AUTH PAGE ====================
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+
+  // Background pattern
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+// ==================== AUTH CARD ====================
+
+.auth-card {
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  position: relative;
+  z-index: 1;
+  animation: slideUp 0.5s ease;
+
+  @media (max-width: 480px) {
+    padding: 2rem 1.5rem;
+    border-radius: 1rem;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ==================== AUTH HEADER ====================
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    svg {
+      animation: fadeIn 0.6s ease;
+    }
+  }
+
+  .auth-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary, #2c3e50);
+    margin: 0 0 0.5rem 0;
+    animation: fadeIn 0.7s ease;
+  }
+
+  .auth-subtitle {
+    font-size: 0.9375rem;
+    color: var(--text-secondary, #6c757d);
+    margin: 0;
+    animation: fadeIn 0.8s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ==================== AUTH TABS ====================
+
+.auth-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background: var(--hover-bg, #f8f9fa);
+  padding: 0.375rem;
+  border-radius: 0.75rem;
+
+  .tab-button {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-secondary, #6c757d);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: var(--text-primary, #2c3e50);
+    }
+
+    &.active {
+      background: white;
+      color: var(--primary-color, #007bff);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// ==================== AUTH CONTENT ====================
+
+.auth-content {
+  animation: fadeIn 0.5s ease;
+}
+
+// ==================== AUTH FOOTER ====================
+
+.auth-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-secondary, #6c757d);
+  }
+}
+
+// ==================== RESPONSIVE ====================
+
+@media (max-width: 768px) {
+  .auth-page {
+    padding: 1rem;
+  }
+
+  .auth-card {
+    max-width: 100%;
+  }
+
+  .auth-header {
+    .auth-title {
+      font-size: 1.5rem;
+    }
+
+    .auth-subtitle {
+      font-size: 0.875rem;
+    }
+  }
+
+  .auth-tabs {
+    .tab-button {
+      font-size: 0.875rem;
+      padding: 0.625rem 0.75rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-header {
+    margin-bottom: 1.5rem;
+
+    .logo {
+      margin-bottom: 1rem;
+
+      svg {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    .auth-title {
+      font-size: 1.375rem;
+    }
+
+    .auth-subtitle {
+      font-size: 0.8125rem;
+    }
+  }
+
+  .auth-tabs {
+    margin-bottom: 1.5rem;
+  }
+
+  .auth-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+
+    p {
+      font-size: 0.75rem;
+    }
+  }
+}

@@ -1,0 +1,7 @@
+.angular
+.claude
+.vscode
+dist
+node_modules
+nul
+package-lock.json

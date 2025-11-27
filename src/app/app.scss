@@ -1,0 +1,148 @@
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  background: var(--bg-gradient);
+}
+
+.sidebar-wrapper {
+  flex-shrink: 0;
+  height: 100vh;
+  width: 280px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  will-change: width, transform;
+
+  &.collapsed {
+    width: 80px;
+  }
+
+  &.hidden {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    position: fixed;
+    left: 0;
+    transform: translateX(-100%);
+    width: 280px !important;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+
+    &.visible:not(.collapsed) {
+      transform: translateX(0);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  @media (min-width: 769px) {
+    transform: translateX(0);
+  }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(2px);
+
+  &.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  @media (min-width: 769px) {
+    display: none;
+  }
+}
+
+.main-content {
+  flex: 1;
+  min-height: 100vh;
+  width: 0;
+  padding: 24px;
+  transition: padding 0.3s ease;
+  background: transparent;
+  position: relative;
+  overflow-x: hidden;
+
+  &.full-width {
+    width: 100%;
+    padding: 0;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 16px;
+
+    &.full-width {
+      padding: 0;
+    }
+  }
+
+  router-outlet + * {
+    animation: fadeInContent 0.4s ease-in-out;
+  }
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:root {
+  --sidebar-bg: #1e293b;
+  --bg-color: #f8fafc;
+  --bg-gradient: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+  --hover-bg: rgba(148, 163, 184, 0.1);
+  --border-color: rgba(148, 163, 184, 0.2);
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+}
+
+.dark-theme {
+  --sidebar-bg: #0f172a;
+  --bg-color: #233764;
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1a1d3a 50%, #1e1a3a 100%);
+  --hover-bg: rgba(148, 163, 184, 0.15);
+  --border-color: rgba(148, 163, 184, 0.1);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+}
+
+// ==================== VARIÁVEIS ====================
+:host {
+  --card-bg: #ffffff;
+  --input-bg: #F9FAFB;
+  --primary-color: #4F85FF;
+  --primary-hover: #3B73E8;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --border-color: #E5E7EB;
+  --hover-bg: #F9FAFB;
+  --success-color: #10B981;
+  --danger-color: #DC2626;
+}
+
+:host-context(.dark-theme) {
+  --card-bg: #1e293b;
+  --input-bg: #0f172a;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border-color: #334155;
+  --hover-bg: #334155;
+}

@@ -1,0 +1,64 @@
+<div class="json-viewer-container">
+  <div class="json-viewer-header" *ngIf="showCopyButton || showMaximizeButton">
+    <button class="btn-action" *ngIf="showMaximizeButton" (click)="maximizar()" title="Visualizar maximizado">
+      <span class="material-icons">fullscreen</span>
+      Maximizar
+    </button>
+    <button class="btn-action btn-copy" *ngIf="showCopyButton" (click)="copiar()" [class.copied]="copiado">
+      <span class="material-icons">{{ copiado ? 'check' : 'content_copy' }}</span>
+      {{ copiado ? 'Copiado!' : 'Copiar' }}
+    </button>
+  </div>
+
+  <div class="json-viewer-content">
+    <pre class="json-code" [innerHTML]="colorizedJson"></pre>
+  </div>
+</div>
+
+<!-- Modal Maximizado -->
+<div class="json-modal-overlay" *ngIf="maximizado" (click)="fecharMaximizado()">
+  <div class="json-modal-content" (click)="$event.stopPropagation()">
+    <!-- Header do Modal -->
+    <div class="json-modal-header">
+      <div class="search-container">
+        <span class="material-icons search-icon">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Buscar no JSON..."
+          [(ngModel)]="termoBusca"
+          (input)="buscar(termoBusca)"
+        />
+        <button class="btn-clear-search" *ngIf="termoBusca" (click)="limparBusca()" title="Limpar busca">
+          <span class="material-icons">close</span>
+        </button>
+        <div class="search-results" *ngIf="termoBusca">
+          <span *ngIf="resultadosBusca > 0">{{ indiceAtualBusca }} / {{ resultadosBusca }}</span>
+          <span *ngIf="resultadosBusca === 0">Nenhum resultado</span>
+        </div>
+        <div class="search-navigation" *ngIf="resultadosBusca > 0">
+          <button class="btn-nav" (click)="resultadoAnterior()" title="Anterior">
+            <span class="material-icons">keyboard_arrow_up</span>
+          </button>
+          <button class="btn-nav" (click)="proximoResultado()" title="Próximo">
+            <span class="material-icons">keyboard_arrow_down</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-action" (click)="copiar()" [class.copied]="copiado">
+          <span class="material-icons">{{ copiado ? 'check' : 'content_copy' }}</span>
+          {{ copiado ? 'Copiado!' : 'Copiar' }}
+        </button>
+        <button class="btn-close-modal" (click)="fecharMaximizado()" title="Fechar">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Conteúdo do Modal -->
+    <div class="json-modal-body">
+      <pre class="json-code" [innerHTML]="colorizedJson"></pre>
+    </div>
+  </div>
+</div>

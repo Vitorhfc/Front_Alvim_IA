@@ -1,0 +1,41 @@
+<div class="selecao-2fa-container">
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="content">
+    <h3>Escolha o método de verificação</h3>
+    <p class="subtitle">Selecione como deseja receber seu código de verificação:</p>
+
+    <div class="method-buttons">
+      <button
+        class="method-btn"
+        (click)="selecionarMetodo(TipoValidacao.Email)"
+        [disabled]="loading">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        <span class="method-text">E-mail</span>
+        <span class="method-description">Receber código por e-mail</span>
+      </button>
+
+      <button
+        class="method-btn"
+        (click)="selecionarMetodo(TipoValidacao.WhatsApp)"
+        [disabled]="loading">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+        </svg>
+        <span class="method-text">WhatsApp</span>
+        <span class="method-description">Receber código via WhatsApp</span>
+      </button>
+    </div>
+
+    <button
+      class="btn-secondary"
+      (click)="onCancelar()"
+      [disabled]="loading">
+      {{ tituloVoltar }}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,170 @@
+@use '../../Scss/variable.scss' as *;
+
+.snackbar-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.snackbar {
+  min-width: 320px;
+  max-width: 450px;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+  animation: slideInRight 0.3s ease, fadeIn 0.3s ease;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateX(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  // ==================== TIPOS ====================
+
+  &.snackbar-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
+    border-left: 4px solid #059669;
+    color: white;
+
+    .snackbar-icon {
+      color: white;
+    }
+  }
+
+  &.snackbar-error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95));
+    border-left: 4px solid #dc2626;
+    color: white;
+
+    .snackbar-icon {
+      color: white;
+    }
+  }
+
+  &.snackbar-warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95));
+    border-left: 4px solid #d97706;
+    color: white;
+
+    .snackbar-icon {
+      color: white;
+    }
+  }
+
+  &.snackbar-info {
+    background: linear-gradient(135deg, rgba($primary, 0.95), rgba($accent, 0.95));
+    border-left: 4px solid $accent;
+    color: white;
+
+    .snackbar-icon {
+      color: white;
+    }
+  }
+
+  // ==================== CONTEÚDO ====================
+
+  .snackbar-content {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    flex: 1;
+  }
+
+  .snackbar-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .snackbar-message {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .snackbar-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    .material-icons {
+      font-size: 18px;
+      color: white;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+// ==================== ANIMATIONS ====================
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+// ==================== RESPONSIVE ====================
+
+@media (max-width: 576px) {
+  .snackbar-container {
+    left: 1rem;
+    right: 1rem;
+    top: 1rem;
+  }
+
+  .snackbar {
+    min-width: auto;
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,186 @@
+@use "sass:color";
+@use "../../Scss/variable.scss" as *;
+// Projeto\src\app\Scss\variable.scss
+.home-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(262, 83%, 58%) 100%);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-section {
+    text-align: center;
+    margin-bottom: 4rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.icon-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    animation: float 3s ease-in-out infinite;
+}
+
+.chat-icon {
+    width: 60px;
+    height: 60px;
+    color: white;
+}
+
+.title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+
+    @media (max-width: 768px) {
+        font-size: 2.5rem;
+    }
+}
+
+.subtitle {
+    font-size: 1.42em;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+
+    @media (max-width: 768px) {
+        font-size: 1rem;
+    }
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border: none;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 180px;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.btn-primary {
+    background: white;
+    color: hsl(221, 83%, 53%);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.95);
+    }
+}
+
+.btn-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+.features-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    width: 100%;
+    animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: $border-radius;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    &:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 40px;
+        height: 40px;
+        color: white;
+        stroke-width: 2;
+    }
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.feature-description {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
