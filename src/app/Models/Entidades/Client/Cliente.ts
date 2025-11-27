@@ -28,7 +28,4 @@ export interface Cliente extends BaseEntidade {
     funcionarioResponsavelId: string;
     totalMensagens: number;
     contexto: ContextoAtual;
-    flgRespostaResponsavel: boolean; // true = responsável (atendente humano), false = IA
-    dtFlgResponsavelAtiva: Date | null;
-    dtFlgResponsavelDesativada: Date | null;
 }

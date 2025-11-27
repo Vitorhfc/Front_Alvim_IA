@@ -226,7 +226,13 @@
             <!-- Payload -->
             <div class="detail-section">
                 <h3>Payload</h3>
-                <app-json-viewer [content]="logSelecionado.payload" [showCopyButton]="true"></app-json-viewer>
+                <div class="payload-container">
+                    <button class="btn-copy" (click)="copiarPayload(logSelecionado.payload)">
+                        <span class="material-icons">content_copy</span>
+                        Copiar
+                    </button>
+                    <pre class="payload-json">{{ formatarJson(logSelecionado.payload) }}</pre>
+                </div>
             </div>
         </div>
     </div>

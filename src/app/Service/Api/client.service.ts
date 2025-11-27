@@ -6,7 +6,7 @@ import { LocalStorageService } from '../Local/local-storage';
 
 // Importar modelos de entidades do Cliente
 import { Cliente } from '../../Models/Entidades/Client/Cliente';
-import { Mensagem, MensagensClienteResponse, ContagemMensagens } from '../../Models/Entidades/Client/Mensagem';
+import { Mensagem, MensagensClienteResponse } from '../../Models/Entidades/Client/Mensagem';
 import { Agendamento } from '../../Models/Entidades/Client/Agendamento';
 import { Arquivo } from '../../Models/Entidades/Client/Arquivo';
 import { ConfiguracaoIA } from '../../Models/Entidades/Client/ConfiguracaoIa';
@@ -88,14 +88,6 @@ export class ClientService extends BaseApiService {
   }
 
   /**
-   * Busca contagem de mensagens trocadas com um cliente
-   * @param clienteId ID do cliente
-   */
-  async buscarContagemMensagens(clienteId: string): Promise<ContagemMensagens> {
-    return this.get<ContagemMensagens>(`/Cliente/${clienteId}/mensagens/contagem`);
-  }
-
-  /**
    * Busca mensagem por ID
    */
   async buscarMensagemPorId(id: string): Promise<Mensagem> {
@@ -107,30 +99,6 @@ export class ClientService extends BaseApiService {
    */
   async enviarMensagem(mensagem: Partial<Mensagem>): Promise<Mensagem> {
     return this.post<Partial<Mensagem>, Mensagem>('/Mensagem', mensagem);
-  }
-
-  /**
-   * Envia mensagem de texto via WhatsApp
-   * @param clienteId ID do cliente destinatário
-   * @param mensagem Texto da mensagem a ser enviada
-   */
-  async enviarMensagemTexto(clienteId: string, mensagem: string): Promise<any> {
-    return this.post('/AtendimentoWhatsApp/mensagem/texto', {
-      clienteId,
-      mensagem
-    });
-  }
-
-  /**
-   * Alterna modo de resposta entre IA e atendimento humano
-   * @param clienteId ID do cliente
-   * @param atendimentoHumano true para atendimento humano, false para IA
-   */
-  async alternarModoResposta(clienteId: string, atendimentoHumano: boolean): Promise<any> {
-    return this.post('/AtendimentoWhatsApp/modo-resposta/alternar', {
-      clienteId,
-      atendimentoHumano
-    });
   }
 
   /**
@@ -264,7 +232,7 @@ export class ClientService extends BaseApiService {
     try {
       return await this.get<ConfiguracaoIA>('/ConfiguracaoIA');
     } catch (error) {
-      console.error('Nenhuma configuração de IA encontrada');
+      console.log('Nenhuma configuração de IA encontrada');
       return null;
     }
   }

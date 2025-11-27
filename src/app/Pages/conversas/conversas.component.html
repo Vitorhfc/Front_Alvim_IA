@@ -53,17 +53,7 @@
           </div>
           <div class="conversa-details">
             <div class="conversa-header-item">
-              <div class="conversa-nome-wrapper">
-                <span class="conversa-nome">{{ conversa.clienteNome }}</span>
-                <span
-                  class="modo-resposta-icon"
-                  [class.humano]="conversa.atendimentoHumano"
-                  [class.ia]="!conversa.atendimentoHumano"
-                  [title]="conversa.atendimentoHumano ? 'Resposta por atendente' : 'Resposta automatizada'"
-                >
-                  <span class="material-icons">{{ conversa.atendimentoHumano ? 'person' : 'smart_toy' }}</span>
-                </span>
-              </div>
+              <span class="conversa-nome">{{ conversa.clienteNome }}</span>
               <span class="conversa-horario">{{ conversa.horario }}</span>
             </div>
             <div class="conversa-footer-item">
@@ -99,17 +89,16 @@
         <div class="chat-actions">
           <button
             class="icon-btn"
-            title="Configurações de atendimento"
-            (click)="togglePainelLateral()"
-          >
-            <span class="material-icons">settings</span>
-          </button>
-          <button
-            class="icon-btn"
             title="Ver detalhes do cliente"
             (click)="abrirDetalhesCliente(conversaSelecionada)"
           >
             <span class="material-icons">person</span>
+          </button>
+          <button class="icon-btn" title="Ligar">
+            <span class="material-icons">call</span>
+          </button>
+          <button class="icon-btn" title="Mais opções">
+            <span class="material-icons">more_vert</span>
           </button>
         </div>
       </header>
@@ -278,56 +267,4 @@
       <p>Selecione uma conversa na lista para começar</p>
     </section>
   </main>
-
-  <!-- Painel Lateral de Configurações -->
-  <aside class="painel-lateral" *ngIf="conversaSelecionada" [class.aberto]="painelLateralAberto">
-    <div class="painel-lateral-header">
-      <h3>Configurações</h3>
-      <button class="icon-btn-close" (click)="fecharPainelLateral()">
-        <span class="material-icons">close</span>
-      </button>
-    </div>
-
-    <div class="painel-lateral-content">
-      <div class="config-section">
-        <h4 class="config-title">Modo de Atendimento</h4>
-        <p class="config-description">
-          Defina como as mensagens deste cliente serão respondidas
-        </p>
-
-        <div class="config-option">
-          <div class="switch-container">
-            <label class="switch">
-              <input
-                type="checkbox"
-                [checked]="conversaSelecionada.atendimentoHumano"
-                (change)="alternarModoResposta()"
-                [disabled]="alterandoModoResposta"
-              />
-              <span class="slider"></span>
-            </label>
-            <div class="switch-label">
-              <div class="modo-info">
-                <span class="material-icons modo-icon" [class.ativo]="conversaSelecionada.atendimentoHumano">
-                  {{ conversaSelecionada.atendimentoHumano ? 'person' : 'smart_toy' }}
-                </span>
-                <div class="modo-texto">
-                  <strong>{{ conversaSelecionada.atendimentoHumano ? 'Atendente Humano' : 'Resposta Automatizada (IA)' }}</strong>
-                  <p>{{ conversaSelecionada.atendimentoHumano ? 'Mensagens serão respondidas manualmente' : 'IA responderá automaticamente' }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="loading-switch" *ngIf="alterandoModoResposta">
-            <div class="spinner-small"></div>
-            <span>Alterando...</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Overlay -->
-  <div class="painel-overlay" *ngIf="painelLateralAberto" (click)="fecharPainelLateral()"></div>
 </div>

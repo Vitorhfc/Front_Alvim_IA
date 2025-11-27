@@ -63,7 +63,7 @@
             <span class="material-icons">message</span>
           </div>
           <div class="stat-info">
-            <span class="stat-value">{{ contagemMensagens?.totalMensagens || 0 }}</span>
+            <span class="stat-value">{{ cliente.totalMensagens || 0 }}</span>
             <span class="stat-label">Mensagens</span>
           </div>
         </div>
@@ -106,7 +106,7 @@
           [disabled]="editMode">
           <span class="material-icons">chat</span>
           Mensagens
-          <span class="badge" *ngIf="contagemMensagens?.totalMensagens">{{ contagemMensagens?.totalMensagens }}</span>
+          <span class="badge" *ngIf="cliente.totalMensagens">{{ cliente.totalMensagens }}</span>
         </button>
         <button class="tab-btn" [class.active]="activeTab === 'historico'" (click)="selecionarTab('historico')"
           [disabled]="editMode">
@@ -176,70 +176,24 @@
 
           <div class="form-section">
             <h3 class="section-title">
-              <span class="material-icons">support_agent</span>
-              Modo de Atendimento
-            </h3>
-
-            <div class="modo-atendimento-container">
-              <div class="modo-atendimento-info">
-                <div class="modo-icon-container">
-                  <span class="material-icons modo-icon" [class.ativo]="cliente.flgRespostaResponsavel">
-                    {{ cliente.flgRespostaResponsavel ? 'person' : 'smart_toy' }}
-                  </span>
-                </div>
-                <div class="modo-detalhes">
-                  <p class="modo-descricao">Status atual:</p>
-                  <strong class="modo-titulo">{{ cliente.flgRespostaResponsavel ? 'Atendente Humano' : 'Resposta Automatizada (IA)' }}</strong>
-                  <p class="modo-descricao">{{ cliente.flgRespostaResponsavel ? 'Mensagens serão respondidas manualmente' : 'IA responderá automaticamente' }}</p>
-                </div>
-              </div>
-
-              <div class="modo-atendimento-switch">
-                <label class="switch">
-                  <input
-                    type="checkbox"
-                    [checked]="cliente.flgRespostaResponsavel"
-                    (click)="alternarModoResposta(); $event.preventDefault()"
-                    [disabled]="alterandoModoResposta || editMode"
-                  />
-                  <span class="slider" (click)="!alterandoModoResposta && !editMode && alternarModoResposta()"></span>
-                </label>
-                <span class="switch-label-text">
-                  {{ cliente.flgRespostaResponsavel ? 'Atendimento humano' : 'Atendimento IA' }}
-                </span>
-              </div>
-
-              <div class="loading-switch" *ngIf="alterandoModoResposta">
-                <div class="spinner-small"></div>
-                <span>Alterando modo...</span>
-              </div>
-            </div>
-
-            <div class="modo-atendimento-datas">
-              <div class="data-item" *ngIf="cliente.dtFlgResponsavelAtiva">
-                <span class="material-icons">schedule</span>
-                <div class="data-info">
-                  <strong>Atendente ativado em:</strong>
-                  <span>{{ formatarData(cliente.dtFlgResponsavelAtiva) }}</span>
-                </div>
-              </div>
-              <div class="data-item" *ngIf="cliente.dtFlgResponsavelDesativada">
-                <span class="material-icons">schedule</span>
-                <div class="data-info">
-                  <strong>Atendente desativado em:</strong>
-                  <span>{{ formatarData(cliente.dtFlgResponsavelDesativada) }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h3 class="section-title">
               <span class="material-icons">chat_bubble</span>
               Contexto da Conversa
             </h3>
 
             <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">Intenção Identificada</label>
+                <div class="info-box">
+                  {{ (cliente.contexto && cliente.contexto.intencaoIdentificada) || 'Não identificada' }}
+                </div>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Próxima Ação Sugerida</label>
+                <div class="info-box">
+                  {{ (cliente.contexto && cliente.contexto.proximaAcaoSugerida) || 'Nenhuma' }}
+                </div>
+              </div>
 
               <div class="form-group">
                 <label class="form-label">Data Primeiro Contato</label>
@@ -269,86 +223,9 @@
                 <label class="form-label">Total de Mensagens</label>
                 <div class="info-box stat-highlight">
                   <span class="material-icons">message</span>
-                  <strong>{{ contagemMensagens?.totalMensagens || 0 }}</strong>
+                  <strong>{{ cliente.totalMensagens || 0 }}</strong>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h3 class="section-title">
-              <span class="material-icons">analytics</span>
-              Estatísticas de Mensagens
-            </h3>
-
-            <!-- Loading State -->
-            <div class="loading-contagem" *ngIf="loadingContagem">
-              <div class="spinner-small"></div>
-              <span>Carregando estatísticas...</span>
-            </div>
-
-            <!-- Estatísticas -->
-            <div class="contagem-mensagens-container" *ngIf="!loadingContagem && contagemMensagens">
-              <div class="contagem-grid">
-                <div class="contagem-card total">
-                  <div class="contagem-icon">
-                    <span class="material-icons">forum</span>
-                  </div>
-                  <div class="contagem-info">
-                    <span class="contagem-label">Total de Mensagens</span>
-                    <span class="contagem-valor">{{ contagemMensagens.totalMensagens }}</span>
-                  </div>
-                </div>
-
-                <div class="contagem-card cliente">
-                  <div class="contagem-icon">
-                    <span class="material-icons">person</span>
-                  </div>
-                  <div class="contagem-info">
-                    <span class="contagem-label">Mensagens do Cliente</span>
-                    <span class="contagem-valor">{{ contagemMensagens.mensagensCliente }}</span>
-                  </div>
-                </div>
-
-                <div class="contagem-card responsavel">
-                  <div class="contagem-icon">
-                    <span class="material-icons">support_agent</span>
-                  </div>
-                  <div class="contagem-info">
-                    <span class="contagem-label">Mensagens do Atendente</span>
-                    <span class="contagem-valor">{{ contagemMensagens.mensagensResponsavel }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Barra de progresso visual -->
-              <div class="contagem-progress-container" *ngIf="contagemMensagens.totalMensagens > 0">
-                <div class="progress-labels">
-                  <span class="progress-label">Distribuição de Mensagens</span>
-                  <span class="progress-percentage">
-                    {{ ((contagemMensagens.mensagensCliente / contagemMensagens.totalMensagens) * 100).toFixed(0) }}% Cliente /
-                    {{ ((contagemMensagens.mensagensResponsavel / contagemMensagens.totalMensagens) * 100).toFixed(0) }}% Atendente
-                  </span>
-                </div>
-                <div class="progress-bar">
-                  <div
-                    class="progress-segment cliente-segment"
-                    [style.width.%]="(contagemMensagens.mensagensCliente / contagemMensagens.totalMensagens) * 100"
-                    [title]="'Cliente: ' + contagemMensagens.mensagensCliente + ' mensagens'"
-                  ></div>
-                  <div
-                    class="progress-segment responsavel-segment"
-                    [style.width.%]="(contagemMensagens.mensagensResponsavel / contagemMensagens.totalMensagens) * 100"
-                    [title]="'Atendente: ' + contagemMensagens.mensagensResponsavel + ' mensagens'"
-                  ></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Empty State -->
-            <div class="empty-state-contagem" *ngIf="!loadingContagem && !contagemMensagens">
-              <span class="material-icons">inbox</span>
-              <p>Nenhuma estatística disponível</p>
             </div>
           </div>
 

@@ -80,11 +80,3 @@ export interface MensagensClienteResponse {
     mensagensResponsavel: number;
     mensagens: Mensagem[];
 }
-
-export interface ContagemMensagens {
-    clienteId: string;
-    clienteNome: string;
-    totalMensagens: number;
-    mensagensCliente: number;
-    mensagensResponsavel: number;
-}

@@ -75,6 +75,7 @@ export class TemplatesComponent implements OnInit {
       // const templates = await this.templatesService.listarTemplates();
       // this.templates = templates;
 
+      console.log('Templates: Usando dados mockados. Implementar integração com API.');
     } catch (error) {
       console.error('Erro ao carregar templates:', error);
       // TODO: Exibir mensagem de erro usando SnackBar
@@ -137,6 +138,7 @@ export class TemplatesComponent implements OnInit {
     //   await this.templatesService.criarTemplate(this.templateSelecionado);
     // }
 
+    console.log('Templates: Salvando template. Implementar integração com API.');
     this.modoEdicao = false;
     this.carregarDados();
   }
@@ -153,6 +155,7 @@ export class TemplatesComponent implements OnInit {
     // TODO: Implementar exclusão via API
     // await this.templatesService.excluirTemplate(template.id);
 
+    console.log('Templates: Excluindo template. Implementar integração com API.');
     this.templates = this.templates.filter(t => t.id !== template.id);
     if (this.templateSelecionado?.id === template.id) {
       this.templateSelecionado = null;
@@ -165,5 +168,6 @@ export class TemplatesComponent implements OnInit {
     // TODO: Implementar atualização de status via API
     // await this.templatesService.atualizarTemplate(template.id, { ativo: template.ativo });
 
+    console.log('Templates: Alternando status. Implementar integração com API.');
   }
 }

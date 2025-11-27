@@ -7,7 +7,7 @@ import { SidebarComponent } from '../../Components/sidebar/sidebar.component';
 import { ClientService } from '../../Service/Api/client.service';
 import { SnackbarService } from '../../Service/snackbar';
 import { Cliente, StatusConversa } from '../../Models/Entidades/Client/Cliente';
-import { Mensagem as MensagemAPI, ContagemMensagens } from '../../Models/Entidades/Client/Mensagem';
+import { Mensagem as MensagemAPI } from '../../Models/Entidades/Client/Mensagem';
 
 interface MensagemView {
   id: string;
@@ -30,8 +30,7 @@ export class ClienteComponent implements OnInit, OnDestroy {
   editMode: boolean = false;
   salvando: boolean = false;
   removendo: boolean = false;
-  alterandoModoResposta: boolean = false;
-
+  
   // Form data
   formData: Partial<Cliente> = {};
 
@@ -39,10 +38,6 @@ export class ClienteComponent implements OnInit, OnDestroy {
   activeTab: 'dados' | 'mensagens' | 'historico' = 'dados';
   mensagens: MensagemView[] = [];
   loadingMensagens: boolean = false;
-
-  // Contagem de mensagens
-  contagemMensagens: ContagemMensagens | null = null;
-  loadingContagem: boolean = false;
 
   // Gerenciamento de subscrições
   private destroy$ = new Subject<void>();
@@ -53,7 +48,7 @@ export class ClienteComponent implements OnInit, OnDestroy {
     private clientService: ClientService,
     private snackbarService: SnackbarService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const clienteId = this.route.snapshot.paramMap.get('id');
@@ -82,9 +77,6 @@ export class ClienteComponent implements OnInit, OnDestroy {
       this.cliente = await this.clientService.buscarClientePorId(id);
       this.formData = { ...this.cliente };
       this.error = null;
-
-      // Carregar contagem de mensagens
-      this.carregarContagemMensagens();
     } catch (error: any) {
       this.error = error.message || 'Erro ao carregar dados do cliente';
       console.error('Erro ao carregar cliente:', error);
@@ -117,32 +109,13 @@ export class ClienteComponent implements OnInit, OnDestroy {
           dtEnvio: msg.dtRecebido
         }))
         .sort((a, b) => new Date(a.dtEnvio).getTime() - new Date(b.dtEnvio).getTime());
-
+        
     } catch (error: any) {
       console.error('Erro ao carregar mensagens:', error);
       this.snackbarService.error('Erro ao carregar mensagens');
       this.mensagens = [];
     } finally {
       this.loadingMensagens = false;
-      this.cdr.detectChanges();
-    }
-  }
-
-  async carregarContagemMensagens(): Promise<void> {
-    if (!this.cliente?.id || this.loadingContagem) return;
-
-    this.loadingContagem = true;
-    this.cdr.detectChanges();
-
-    try {
-      this.contagemMensagens = await this.clientService.buscarContagemMensagens(
-        this.cliente.id
-      );
-    } catch (error: any) {
-      console.error('Erro ao carregar contagem de mensagens:', error);
-      this.contagemMensagens = null;
-    } finally {
-      this.loadingContagem = false;
       this.cdr.detectChanges();
     }
   }
@@ -202,7 +175,7 @@ export class ClienteComponent implements OnInit, OnDestroy {
     const confirmar = confirm(
       `Tem certeza que deseja remover o cliente "${this.cliente.nome}"?\n\nEsta ação não pode ser desfeita.`
     );
-
+    
     if (!confirmar) return;
 
     this.removendo = true;
@@ -212,7 +185,7 @@ export class ClienteComponent implements OnInit, OnDestroy {
     try {
       await this.clientService.removerCliente(this.cliente.id);
       this.snackbarService.success('Cliente removido com sucesso!');
-
+      
       // Aguarda um momento antes de navegar
       setTimeout(() => {
         this.router.navigate(['/conversas']);
@@ -230,61 +203,6 @@ export class ClienteComponent implements OnInit, OnDestroy {
 
   voltarParaConversas(): void {
     this.router.navigate(['/conversas']);
-  }
-
-  async alternarModoResposta(): Promise<void> {
-    if (!this.cliente?.id) return;
-
-    if (this.alterandoModoResposta) {
-      console.log('Já está alterando modo de resposta, ignorando...');
-      return;
-    }
-
-    console.log('Iniciando alteração de modo de resposta...');
-    this.alterandoModoResposta = true;
-    const novoModo = !this.cliente.flgRespostaResponsavel;
-    this.cdr.detectChanges();
-
-    this.alterandoModoResposta = false;
-    this.cdr.detectChanges();
-
-    try {
-      console.log('Chamando API para alternar modo:', { clienteId: this.cliente.id, novoModo });
-
-      await this.clientService.alternarModoResposta(
-        this.cliente.id,
-        novoModo
-      );
-
-      console.log('API retornou sucesso, atualizando estado local...');
-
-      // Atualizar estado local
-      this.cliente.flgRespostaResponsavel = novoModo;
-
-      // Atualizar as datas
-      if (novoModo) {
-        this.cliente.dtFlgResponsavelAtiva = new Date();
-      } else {
-        this.cliente.dtFlgResponsavelDesativada = new Date();
-      }
-
-      const mensagem = novoModo
-        ? 'Modo alterado para: Atendente Humano'
-        : 'Modo alterado para: Resposta Automatizada (IA)';
-
-      this.snackbarService.success(mensagem);
-      console.log('Sucesso ao alterar modo de resposta');
-    } catch (error: any) {
-      console.error('Erro ao alternar modo de resposta:', error);
-      this.snackbarService.error(
-        error.message || 'Erro ao alternar modo de resposta. Tente novamente.'
-      );
-    } finally {
-      console.log('Finalizando alteração de modo de resposta, resetando estado...');
-      this.alterandoModoResposta = false;
-      this.cdr.detectChanges();
-      console.log('Estado resetado:', { alterandoModoResposta: this.alterandoModoResposta });
-    }
   }
 
   // ==================== HELPERS ====================
@@ -323,7 +241,7 @@ export class ClienteComponent implements OnInit, OnDestroy {
 
     try {
       const dataObj = new Date(data);
-
+      
       if (isNaN(dataObj.getTime())) {
         return 'Data inválida';
       }
@@ -380,7 +298,7 @@ export class ClienteComponent implements OnInit, OnDestroy {
     if (!cpf) return 'Não informado';
 
     const cleaned = cpf.replace(/\D/g, '');
-
+    
     if (cleaned.length === 11) {
       return `${cleaned.substring(0, 3)}.${cleaned.substring(3, 6)}.${cleaned.substring(6, 9)}-${cleaned.substring(9)}`;
     }
@@ -392,11 +310,11 @@ export class ClienteComponent implements OnInit, OnDestroy {
     if (!nome) return '?';
 
     const names = nome.trim().split(' ').filter(n => n.length > 0);
-
+    
     if (names.length >= 2) {
       return (names[0][0] + names[names.length - 1][0]).toUpperCase();
     }
-
+    
     return nome.substring(0, 2).toUpperCase();
   }
 

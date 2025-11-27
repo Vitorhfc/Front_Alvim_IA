@@ -2,12 +2,11 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClientService } from '../../../Service/Api/client.service';
 import { LogWaha, LogWahaPaginado } from '../../../Models/Entidades/Client/LogWaha';
-import { JsonViewerComponent } from '../../../Components/json-viewer/json-viewer.component';
 
 @Component({
   selector: 'app-log-waha-view',
   standalone: true,
-  imports: [CommonModule, JsonViewerComponent],
+  imports: [CommonModule],
   templateUrl: './log-waha-view.html',
   styleUrl: './log-waha-view.scss',
 })
@@ -113,6 +112,20 @@ export class LogWahaView implements OnInit {
   }
 
   /**
+   * Formata JSON para exibição
+   */
+  formatarJson(json: string | null): string {
+    if (!json) return 'N/A';
+
+    try {
+      const obj = JSON.parse(json);
+      return JSON.stringify(obj, null, 2);
+    } catch {
+      return json;
+    }
+  }
+
+  /**
    * Retorna a classe CSS baseada no tipo de evento
    */
   getClasseTipoEvento(tipoEvento: string): string {
@@ -124,6 +137,16 @@ export class LogWahaView implements OnInit {
     };
 
     return classes[tipoEvento] || 'badge-default';
+  }
+
+  /**
+   * Copia o payload para a área de transferência
+   */
+  copiarPayload(payload: string): void {
+    navigator.clipboard.writeText(payload).then(
+      () => alert('Payload copiado para a área de transferência!'),
+      (err) => console.error('Erro ao copiar payload:', err)
+    );
   }
 
   /**

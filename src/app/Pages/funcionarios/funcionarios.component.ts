@@ -62,6 +62,7 @@ export class FuncionariosComponent implements OnInit {
 
     try {
       this.funcionarios = await this.clientService.listarFuncionarios();
+      console.log('Funcionários carregados:', this.funcionarios.length);
     } catch (error: any) {
       this.errorMessage = error.message || 'Erro ao carregar funcionários';
       console.error('Erro ao carregar funcionários:', error);

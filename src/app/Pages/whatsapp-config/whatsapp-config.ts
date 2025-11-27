@@ -87,6 +87,7 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
       }
 
       // Inicia monitoramento automático via polling
+      console.log('✅ Iniciando monitoramento via polling');
       this.iniciarMonitoramentoStatus();
 
       this.carregando = false;
@@ -250,6 +251,8 @@ export class WhatsappConfigComponent implements OnInit, OnDestroy {
       // Médio (5min) quando desconectado, erro ou com erros consecutivos
       interval = this.POLLING_ERROR_INTERVAL_MS;
     }
+
+    console.log(`📡 Iniciando polling com intervalo de ${interval}ms (status: ${this.statusConexao.status}, erros: ${this.errosConsecutivos})`);
 
     this.pollingInterval = setInterval(async () => {
       // Só verifica se não estiver carregando ou conectando

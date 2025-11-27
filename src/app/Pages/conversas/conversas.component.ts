@@ -17,7 +17,6 @@ interface Conversa {
   status: 'online' | 'offline';
   avatar: string;
   cliente: Cliente;
-  atendimentoHumano: boolean; // true = atendente humano, false = IA
 }
 
 interface Mensagem {
@@ -57,10 +56,6 @@ export class ConversasComponent implements OnInit, OnDestroy {
 
   // Mensagens da conversa atual
   mensagens: Mensagem[] = [];
-
-  // Painel lateral
-  painelLateralAberto: boolean = false;
-  alterandoModoResposta: boolean = false;
 
   // Gerenciamento de subscrições
   private destroy$ = new Subject<void>();
@@ -117,8 +112,7 @@ export class ConversasComponent implements OnInit, OnDestroy {
         naoLidas: 0, // TODO: Implementar contagem de mensagens não lidas
         status: this.verificarStatusOnline(cliente.dtUltimaInteracao),
         avatar: this.getInitials(cliente.nome || 'D'),
-        cliente: cliente,
-        atendimentoHumano: cliente.flgRespostaResponsavel || false
+        cliente: cliente
       }))
       .sort((a, b) => {
         // Ordenar por data de última interação (mais recente primeiro)
@@ -256,7 +250,7 @@ export class ConversasComponent implements OnInit, OnDestroy {
         id: msg.id || '',
         texto: msg.conteudoTexto || this.obterTextoTipoMensagem(msg.tipoMensagem),
         horario: this.formatarHorarioMensagem(msg.dtRecebido),
-        isUsuario: !msg.flgMensagemCliente, // Invertido: true = atendente, false = cliente
+        isUsuario: msg.flgMensagemCliente || false,
         tipoMensagem: msg.tipoMensagem,
         idMensagemResposta: msg.idMensagemResposta
       };
@@ -373,20 +367,23 @@ export class ConversasComponent implements OnInit, OnDestroy {
     this.scrollToBottom();
 
     try {
-      // Enviar mensagem via WhatsApp
-      await this.clientService.enviarMensagemTexto(
-        this.conversaSelecionada.id,
-        textoMensagem
-      );
+      // TODO: Implementar envio real para API
+      // const mensagemEnviada = await this.clientService.enviarMensagem({
+      //   clienteId: this.conversaSelecionada.id,
+      //   texto: textoMensagem,
+      //   remetenteId: this.usuarioAtualId
+      // });
+      //
+      // novaMensagemObj.id = mensagemEnviada.id;
 
-      console.log('Mensagem enviada com sucesso:', textoMensagem);
+      console.log('Enviando mensagem:', textoMensagem);
+      
+      // Simular resposta da IA (remover quando API estiver pronta)
+      await this.simularRespostaIA();
 
       // Atualizar última mensagem da conversa
       this.conversaSelecionada.ultimaMensagem = textoMensagem;
       this.conversaSelecionada.horario = novaMensagemObj.horario;
-
-      // Mostrar feedback de sucesso
-      this.snackbarService.success('Mensagem enviada com sucesso!');
 
     } catch (error: any) {
       console.error('Erro ao enviar mensagem:', error);
@@ -406,6 +403,42 @@ export class ConversasComponent implements OnInit, OnDestroy {
     } finally {
       this.enviandoMensagem = false;
       this.cdr.detectChanges();
+    }
+  }
+
+  private async simularRespostaIA(): Promise<void> {
+    // Simular delay de processamento
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const respostasIA = [
+      'Entendo sua solicitação. Como posso auxiliá-lo?',
+      'Obrigado pela mensagem! Estou aqui para ajudar.',
+      'Recebi sua mensagem. Em que mais posso ser útil?',
+      'Perfeito! Há mais alguma informação que você gostaria de compartilhar?',
+      'Entendido. Vou processar essa informação.'
+    ];
+
+    const respostaAleatoria = respostasIA[Math.floor(Math.random() * respostasIA.length)];
+
+    const respostaIA: Mensagem = {
+      id: `ia_${Date.now()}`,
+      texto: respostaAleatoria,
+      horario: new Date().toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      isUsuario: false,
+      tipoMensagem: TipoMensagem.Texto
+    };
+
+    this.mensagens.push(respostaIA);
+    this.cdr.detectChanges();
+    this.scrollToBottom();
+
+    // Atualizar última mensagem da conversa
+    if (this.conversaSelecionada) {
+      this.conversaSelecionada.ultimaMensagem = respostaAleatoria;
+      this.conversaSelecionada.horario = respostaIA.horario;
     }
   }
 
@@ -434,58 +467,12 @@ export class ConversasComponent implements OnInit, OnDestroy {
     return nome.substring(0, 2).toUpperCase();
   }
 
-  // ==================== PAINEL LATERAL ====================
-
-  togglePainelLateral(): void {
-    this.painelLateralAberto = !this.painelLateralAberto;
-    this.cdr.detectChanges();
-  }
-
-  fecharPainelLateral(): void {
-    this.painelLateralAberto = false;
-    this.cdr.detectChanges();
-  }
-
-  async alternarModoResposta(): Promise<void> {
-    if (!this.conversaSelecionada || this.alterandoModoResposta) {
-      return;
-    }
-
-    this.alterandoModoResposta = true;
-    const novoModo = !this.conversaSelecionada.atendimentoHumano;
-
-    try {
-      await this.clientService.alternarModoResposta(
-        this.conversaSelecionada.id,
-        novoModo
-      );
-
-      // Atualizar estado local
-      this.conversaSelecionada.atendimentoHumano = novoModo;
-      this.conversaSelecionada.cliente.flgRespostaResponsavel = novoModo;
-
-      const mensagem = novoModo
-        ? 'Modo de atendimento alterado para: Atendente Humano'
-        : 'Modo de atendimento alterado para: Resposta Automatizada (IA)';
-
-      this.snackbarService.success(mensagem);
-    } catch (error: any) {
-      console.error('Erro ao alternar modo de resposta:', error);
-      this.snackbarService.error(
-        error.message || 'Erro ao alternar modo de resposta. Tente novamente.'
-      );
-    } finally {
-      this.alterandoModoResposta = false;
-      this.cdr.detectChanges();
-    }
-  }
-
   // TrackBy functions para melhor performance
-  trackByConversaId(_index: number, conversa: Conversa): string {
+  trackByConversaId(index: number, conversa: Conversa): string {
     return conversa.id;
   }
 
-  trackByMensagemId(_index: number, mensagem: Mensagem): string {
+  trackByMensagemId(index: number, mensagem: Mensagem): string {
     return mensagem.id;
   }
 }
