@@ -18,6 +18,7 @@ import { AgendamentosComponent } from './Pages/agendamentos/agendamentos.compone
 import { WhatsappConfigComponent } from './Pages/whatsapp-config/whatsapp-config';
 import { LogWahaView } from './Pages/Pagina logs/log-waha-view/log-waha-view';
 import { LogClientView } from './Pages/Pagina logs/log-client-view/log-client-view';
+import { MenuConfiguracaoComponent } from './Pages/menu-configuracao/menu-configuracao.component';
 
 export const routes: Routes = [
     // ==================== ROTAS PÚBLICAS ====================
@@ -132,6 +133,12 @@ export const routes: Routes = [
         component: AgendamentosComponent,
         canActivate: [logadoGuard],
         title: 'Agendamentos - AI Agent'
+    },
+    {
+        path: 'menu-configuracao',
+        component: MenuConfiguracaoComponent,
+        canActivate: [logadoGuard],
+        title: 'Configuração de Menus - AI Agent'
     },
     {
         path: '**',

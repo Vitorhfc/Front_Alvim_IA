@@ -7,6 +7,7 @@ import { ClientService } from '../../Service/Api/client.service';
 import { SnackbarService } from '../../Service/snackbar';
 import { Cliente, StatusConversa } from '../../Models/Entidades/Client/Cliente';
 import { Mensagem as MensagemAPI, MensagensClienteResponse, TipoMensagem } from '../../Models/Entidades/Client/Mensagem';
+import { SignalRHubService, MensagemWhatsApp } from '../../Service/signalr-hub.service';
 
 interface Conversa {
   id: string;
@@ -69,11 +70,13 @@ export class ConversasComponent implements OnInit, OnDestroy {
     private clientService: ClientService,
     private router: Router,
     private snackbarService: SnackbarService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private signalRService: SignalRHubService
   ) {}
 
   ngOnInit(): void {
     this.carregarDados();
+    this.iniciarSignalR();
   }
 
   ngOnDestroy(): void {
@@ -90,9 +93,6 @@ export class ConversasComponent implements OnInit, OnDestroy {
     try {
       const clientes = await this.clientService.listarClientes();
       this.conversas = this.formatarConversas(clientes);
-
-      // TODO: Configurar WebSocket/SignalR para receber mensagens em tempo real
-      // this.setupWebSocketConnection();
 
       console.log(`Conversas: ${this.conversas.length} conversas carregadas`);
     } catch (error: any) {
@@ -191,14 +191,186 @@ export class ConversasComponent implements OnInit, OnDestroy {
     }
   }
 
-  // TODO: Configurar conexão WebSocket
-  // private setupWebSocketConnection(): void {
-  //   // Implementar conexão com SignalR ou WebSocket para mensagens em tempo real
-  //   // this.signalRService.startConnection();
-  //   // this.signalRService.addMessageListener((mensagem) => {
-  //   //   this.handleNovaMensagem(mensagem);
-  //   // });
-  // }
+  // ==================== SIGNALR ====================
+
+  /**
+   * Inicia a conexão SignalR e configura os listeners para eventos em tempo real
+   */
+  private iniciarSignalR(): void {
+    // Iniciar conexão
+    this.signalRService.startConnection().catch(error => {
+      console.error('Erro ao conectar SignalR:', error);
+    });
+
+    // Escutar novas mensagens
+    this.signalRService.mensagemRecebida$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((mensagemWhatsApp: MensagemWhatsApp) => {
+        this.handleNovaMensagemWhatsApp(mensagemWhatsApp);
+      });
+
+    // Escutar estado da conexão
+    this.signalRService.connectionState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((connected: boolean) => {
+        if (connected) {
+          console.log('✅ SignalR conectado - Conversas em tempo real ativas');
+        } else {
+          console.warn('⚠️ SignalR desconectado - Modo offline');
+        }
+      });
+
+    // Escutar status da sessão WhatsApp
+    this.signalRService.statusSessao$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((statusData) => {
+        console.log('Status WhatsApp atualizado:', statusData);
+        if (statusData.status === 'FAILED' || statusData.status === 'STOPPED') {
+          this.snackbarService.warning(`WhatsApp ${statusData.status}: Verifique a conexão`);
+        }
+      });
+
+    // Escutar atualizações de cliente
+    this.signalRService.clienteAtualizado$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((clienteAtualizadoData) => {
+        this.handleClienteAtualizado(clienteAtualizadoData);
+      });
+  }
+
+  /**
+   * Manipula nova mensagem recebida via SignalR
+   */
+  private handleNovaMensagemWhatsApp(mensagemWhatsApp: MensagemWhatsApp): void {
+    console.log('📨 Nova mensagem recebida via SignalR:', mensagemWhatsApp);
+
+    try {
+      // Extrair informações do payload
+      const payload = mensagemWhatsApp.payload;
+
+      if (!payload || !payload.clienteId) {
+        console.warn('Payload inválido ou sem clienteId:', payload);
+        return;
+      }
+
+      const clienteId = payload.clienteId;
+
+      // Encontrar a conversa correspondente
+      const conversa = this.conversas.find(c => c.id === clienteId);
+
+      if (conversa) {
+        // Atualizar última mensagem e horário
+        conversa.ultimaMensagem = payload.conteudoTexto || this.obterTextoTipoMensagem(payload.tipoMensagem);
+        conversa.horario = this.formatarHorario(new Date());
+        conversa.cliente.dtUltimaInteracao = new Date();
+
+        // Incrementar contador de não lidas se não for a conversa selecionada
+        if (this.conversaSelecionada?.id !== clienteId) {
+          conversa.naoLidas = (conversa.naoLidas || 0) + 1;
+        } else {
+          // Se for a conversa selecionada, adicionar mensagem na lista
+          this.adicionarMensagemNaLista(payload);
+        }
+
+        // Reordenar conversas (mover para o topo)
+        this.reordenarConversas();
+        this.cdr.detectChanges();
+      } else {
+        // Cliente novo que não está na lista - recarregar conversas
+        console.log('Nova conversa detectada, recarregando lista...');
+        this.carregarDados();
+      }
+    } catch (error) {
+      console.error('Erro ao processar mensagem do SignalR:', error);
+    }
+  }
+
+  /**
+   * Adiciona nova mensagem na lista de mensagens da conversa atual
+   */
+  private adicionarMensagemNaLista(payloadMensagem: any): void {
+    if (!this.conversaSelecionada) return;
+
+    const novaMensagem: Mensagem = {
+      id: payloadMensagem.id || `signalr_${Date.now()}`,
+      texto: payloadMensagem.conteudoTexto || this.obterTextoTipoMensagem(payloadMensagem.tipoMensagem),
+      horario: this.formatarHorarioMensagem(new Date()),
+      isUsuario: !payloadMensagem.flgMensagemCliente, // Invertido: true = atendente, false = cliente
+      tipoMensagem: payloadMensagem.tipoMensagem,
+      idMensagemResposta: payloadMensagem.idMensagemResposta
+    };
+
+    // Adicionar informações de mídia se existir
+    if (payloadMensagem.midia && payloadMensagem.tipoMensagem !== TipoMensagem.Texto) {
+      novaMensagem.midia = {
+        urlDownload: payloadMensagem.midia.urlDownload,
+        nomeArquivo: payloadMensagem.midia.nomeArquivo,
+        mimeType: payloadMensagem.midia.mimeType,
+        caption: payloadMensagem.midia.caption
+      };
+    }
+
+    this.mensagens.push(novaMensagem);
+    this.cdr.detectChanges();
+
+    // Scroll para a nova mensagem
+    setTimeout(() => this.scrollToBottom(), 100);
+  }
+
+  /**
+   * Reordena conversas colocando as mais recentes no topo
+   */
+  private reordenarConversas(): void {
+    this.conversas.sort((a, b) => {
+      const dataA = a.cliente.dtUltimaInteracao ? new Date(a.cliente.dtUltimaInteracao).getTime() : 0;
+      const dataB = b.cliente.dtUltimaInteracao ? new Date(b.cliente.dtUltimaInteracao).getTime() : 0;
+      return dataB - dataA;
+    });
+  }
+
+  /**
+   * Manipula atualização de cliente via SignalR
+   */
+  private handleClienteAtualizado(clienteAtualizadoData: any): void {
+    console.log('👤 Cliente atualizado via SignalR:', clienteAtualizadoData);
+
+    try {
+      const clienteAtualizado = clienteAtualizadoData.cliente;
+
+      if (!clienteAtualizado || !clienteAtualizado.id) {
+        console.warn('Dados de cliente inválidos:', clienteAtualizado);
+        return;
+      }
+
+      // Encontrar a conversa correspondente na lista
+      const index = this.conversas.findIndex(c => c.id === clienteAtualizado.id);
+
+      if (index !== -1) {
+        // Atualizar os dados do cliente mantendo a estrutura da conversa
+        this.conversas[index].cliente = clienteAtualizado;
+        this.conversas[index].clienteNome = clienteAtualizado.nome || 'Desconhecido';
+        this.conversas[index].atendimentoHumano = clienteAtualizado.flgRespostaResponsavel || false;
+        this.conversas[index].avatar = this.getInitials(clienteAtualizado.nome || 'D');
+
+        // Se for a conversa selecionada, atualizar também
+        if (this.conversaSelecionada && this.conversaSelecionada.id === clienteAtualizado.id) {
+          this.conversaSelecionada.cliente = clienteAtualizado;
+          this.conversaSelecionada.clienteNome = clienteAtualizado.nome || 'Desconhecido';
+          this.conversaSelecionada.atendimentoHumano = clienteAtualizado.flgRespostaResponsavel || false;
+          this.conversaSelecionada.avatar = this.getInitials(clienteAtualizado.nome || 'D');
+        }
+
+        this.cdr.detectChanges();
+        console.log('✅ Conversa atualizada na lista');
+      } else {
+        // Cliente novo que não está na lista - recarregar conversas
+        console.log('Novo cliente detectado, recarregando lista...');
+        this.carregarDados();
+      }
+    } catch (error) {
+      console.error('Erro ao processar atualização de cliente do SignalR:', error);
+    }
+  }
 
   // ==================== CONVERSAS ====================
 

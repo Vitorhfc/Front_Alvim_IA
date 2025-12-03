@@ -1,0 +1,207 @@
+<div class="menu-config-container">
+  <div class="header">
+    <h1>
+      <span class="material-icons">menu</span>
+      Configuração de Menus
+    </h1>
+    <p class="subtitle">Gerencie os itens do menu lateral da aplicação</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando menus...</p>
+  </div>
+
+  <!-- Conteúdo -->
+  <div *ngIf="!loading" class="content">
+    <!-- Botão Novo Menu -->
+    <div class="actions-bar">
+      <button class="btn btn-secondary-action" (click)="recarregarMenuLateral()" *ngIf="!modoEdicao">
+        <span class="material-icons">refresh</span>
+        Recarregar Menu Lateral
+      </button>
+      <button class="btn btn-primary" (click)="novoMenu()" *ngIf="!modoEdicao">
+        <span class="material-icons">add</span>
+        Novo Menu
+      </button>
+    </div>
+
+    <!-- Formulário de Edição/Criação -->
+    <div class="form-card" *ngIf="modoEdicao">
+      <div class="form-header">
+        <h2>{{ menuSelecionado ? 'Editar Menu' : 'Novo Menu' }}</h2>
+      </div>
+
+      <form class="menu-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="icone">
+              <span class="material-icons">interests</span>
+              Ícone *
+              <span class="hint-text">(Nome do ícone Material Icons)</span>
+            </label>
+            <input
+              type="text"
+              id="icone"
+              [(ngModel)]="formularioMenu.icone"
+              name="icone"
+              class="form-control"
+              placeholder="Ex: dashboard, chat, settings"
+              required
+            />
+            <div class="icon-preview" *ngIf="formularioMenu.icone">
+              <span class="material-icons">{{ formularioMenu.icone }}</span>
+              <span>Preview</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="label">
+              <span class="material-icons">label</span>
+              Label *
+            </label>
+            <input
+              type="text"
+              id="label"
+              [(ngModel)]="formularioMenu.label"
+              name="label"
+              class="form-control"
+              placeholder="Ex: Dashboard"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="route">
+              <span class="material-icons">link</span>
+              Rota *
+            </label>
+            <input
+              type="text"
+              id="route"
+              [(ngModel)]="formularioMenu.route"
+              name="route"
+              class="form-control"
+              placeholder="Ex: /dashboard"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="ordem">
+              <span class="material-icons">reorder</span>
+              Ordem
+            </label>
+            <input
+              type="number"
+              id="ordem"
+              [(ngModel)]="formularioMenu.ordem"
+              name="ordem"
+              class="form-control"
+              min="0"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                [(ngModel)]="formularioMenu.disabled"
+                name="disabled"
+              />
+              <span>Menu desabilitado</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelarEdicao()">
+            <span class="material-icons">close</span>
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-primary" (click)="salvarMenu()">
+            <span class="material-icons">save</span>
+            Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Lista de Menus -->
+    <div class="menus-list" *ngIf="!modoEdicao">
+      <div class="list-header">
+        <h2>Menus Cadastrados ({{ menus.length }})</h2>
+      </div>
+
+      <div class="empty-state" *ngIf="menus.length === 0">
+        <span class="material-icons">menu_open</span>
+        <p>Nenhum menu cadastrado</p>
+        <button class="btn btn-primary" (click)="novoMenu()">
+          <span class="material-icons">add</span>
+          Criar Primeiro Menu
+        </button>
+      </div>
+
+      <div
+        cdkDropList
+        (cdkDropListDropped)="onDrop($event)"
+        class="menu-list-drag"
+      >
+        <div
+          class="menu-item"
+          *ngFor="let menu of menus; let i = index"
+          cdkDrag
+        >
+          <div class="drag-handle" cdkDragHandle>
+            <span class="material-icons">drag_indicator</span>
+          </div>
+
+          <div class="menu-icon">
+            <span class="material-icons">{{ menu.icone }}</span>
+          </div>
+
+          <div class="menu-info">
+            <div class="menu-label">{{ menu.label }}</div>
+            <div class="menu-route">{{ menu.route }}</div>
+          </div>
+
+          <div class="menu-badges">
+            <span class="badge badge-order">Ordem: {{ menu.ordem }}</span>
+            <span class="badge badge-warning" *ngIf="menu.disabled">Desabilitado</span>
+          </div>
+
+          <div class="menu-actions">
+            <!-- Ações -->
+            <button
+              class="btn-icon btn-success"
+              (click)="alternarStatus(menu)"
+              [title]="menu.flgAtivo ? 'Desativar' : 'Ativar'"
+            >
+              <span class="material-icons">{{ menu.flgAtivo ? 'toggle_on' : 'toggle_off' }}</span>
+            </button>
+            <button
+              class="btn-icon btn-primary"
+              (click)="editarMenu(menu)"
+              title="Editar"
+            >
+              <span class="material-icons">edit</span>
+            </button>
+            <button
+              class="btn-icon btn-danger"
+              (click)="confirmarRemocao(menu)"
+              title="Remover"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

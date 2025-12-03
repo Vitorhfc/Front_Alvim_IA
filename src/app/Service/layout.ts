@@ -21,6 +21,10 @@ export class LayoutService {
   private sidebarCollapsedSubject = new BehaviorSubject<boolean>(this.loadSidebarState());
   public sidebarCollapsed$: Observable<boolean> = this.sidebarCollapsedSubject.asObservable();
 
+  // Subject para forçar reload do menu lateral
+  private reloadMenuSubject = new BehaviorSubject<boolean>(false);
+  public reloadMenu$: Observable<boolean> = this.reloadMenuSubject.asObservable();
+
   constructor() {}
 
   /**
@@ -105,5 +109,12 @@ export class LayoutService {
     if (this.sidebarModeSubject.value !== 'never') {
       this.setSidebarMode('hidden');
     }
+  }
+
+  /**
+   * Dispara evento para forçar o reload do menu lateral
+   */
+  reloadMenu(): void {
+    this.reloadMenuSubject.next(true);
   }
 }

@@ -5,30 +5,118 @@ import { environment } from '../Environment/Environment';
 import { LocalStorageService } from './Local/local-storage';
 import { Subject, Observable } from 'rxjs';
 
-export interface WhatsAppStatusUpdate {
+// ==================== INTERFACES ====================
+
+/**
+ * Evento PRINCIPAL - Nova mensagem recebida via webhook
+ */
+export interface MensagemWhatsApp {
+  empresaId: string;
+  eventType: string;
+  payload: any;
+  timestamp: string;
+}
+
+/**
+ * Confirmação de conexão bem-sucedida
+ */
+export interface OnConnectedData {
+  connectionId: string;
+  empresaId: string;
+  usuarioId: string;
+  timestamp: string;
+  message: string;
+}
+
+/**
+ * Atualização de status de sessão WhatsApp
+ */
+export interface StatusSessaoData {
+  empresaId: string;
   sessionName: string;
-  status: string;
-  message?: string;
-  telefone?: string;
-  qrCode?: string;
-  timestamp: Date;
+  status: 'WORKING' | 'SCAN_QR_CODE' | 'STARTING' | 'FAILED' | 'STOPPED';
+  timestamp: string;
+}
+
+/**
+ * QR Code gerado para conectar WhatsApp
+ */
+export interface QRCodeData {
+  empresaId: string;
+  sessionName: string;
+  qrCode: string;
+  timestamp: string;
+}
+
+/**
+ * WhatsApp conectado com sucesso
+ */
+export interface WhatsAppConectadoData {
+  empresaId: string;
+  sessionName: string;
+  telefone: string;
+  timestamp: string;
+}
+
+/**
+ * WhatsApp desconectado
+ */
+export interface WhatsAppDesconectadoData {
+  empresaId: string;
+  sessionName: string;
+  motivo?: string;
+  timestamp: string;
+}
+
+/**
+ * Resposta ao Ping
+ */
+export interface PongData {
+  timestamp: string;
+  connectionId: string;
+}
+
+/**
+ * Cliente atualizado
+ */
+export interface ClienteAtualizadoData {
+  empresaId: string;
+  tipoAtualizacao: string;
+  cliente: any;
+  timestamp: string;
 }
 
 /**
  * Serviço para gerenciar conexões SignalR com o backend
- * Permite receber atualizações em tempo real sobre o status do WhatsApp
+ * Permite receber atualizações em tempo real sobre mensagens e status do WhatsApp
  */
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRHubService {
   private hubConnection?: HubConnection;
-  private whatsappStatusSubject = new Subject<WhatsAppStatusUpdate>();
-  private connectionStateSubject = new Subject<boolean>();
 
-  // Observables para componentes se inscreverem
-  public whatsappStatus$: Observable<WhatsAppStatusUpdate> = this.whatsappStatusSubject.asObservable();
+  // Subjects para eventos
+  private connectionStateSubject = new Subject<boolean>();
+  private mensagemRecebidaSubject = new Subject<MensagemWhatsApp>();
+  private statusSessaoSubject = new Subject<StatusSessaoData>();
+  private qrCodeGeradoSubject = new Subject<QRCodeData>();
+  private whatsappConectadoSubject = new Subject<WhatsAppConectadoData>();
+  private whatsappDesconectadoSubject = new Subject<WhatsAppDesconectadoData>();
+  private onConnectedSubject = new Subject<OnConnectedData>();
+  private pongSubject = new Subject<PongData>();
+  private clienteAtualizadoSubject = new Subject<ClienteAtualizadoData>();
+
+  // Observables públicos para componentes se inscreverem
   public connectionState$: Observable<boolean> = this.connectionStateSubject.asObservable();
+  public mensagemRecebida$: Observable<MensagemWhatsApp> = this.mensagemRecebidaSubject.asObservable();
+  public statusSessao$: Observable<StatusSessaoData> = this.statusSessaoSubject.asObservable();
+  public qrCodeGerado$: Observable<QRCodeData> = this.qrCodeGeradoSubject.asObservable();
+  public whatsappConectado$: Observable<WhatsAppConectadoData> = this.whatsappConectadoSubject.asObservable();
+  public whatsappDesconectado$: Observable<WhatsAppDesconectadoData> = this.whatsappDesconectadoSubject.asObservable();
+  public onConnected$: Observable<OnConnectedData> = this.onConnectedSubject.asObservable();
+  public pong$: Observable<PongData> = this.pongSubject.asObservable();
+  public clienteAtualizado$: Observable<ClienteAtualizadoData> = this.clienteAtualizadoSubject.asObservable();
 
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
@@ -120,50 +208,57 @@ export class SignalRHubService {
   private setupEventHandlers(): void {
     if (!this.hubConnection) return;
 
-    // Evento: Status do WhatsApp alterado
-    this.hubConnection.on('WhatsAppStatusChanged', (update: WhatsAppStatusUpdate) => {
-      console.log('📱 Status do WhatsApp atualizado:', update);
-      this.whatsappStatusSubject.next(update);
+    // ⭐ EVENTO PRINCIPAL - Nova mensagem recebida via webhook
+    this.hubConnection.on('ReceberMensagem', (data: MensagemWhatsApp) => {
+      console.log('📨 Nova mensagem recebida:', data);
+      this.mensagemRecebidaSubject.next(data);
     });
 
-    // Evento: QR Code gerado/atualizado
-    this.hubConnection.on('QRCodeGerado', (data: { sessionName: string; qrCode: string }) => {
-      console.log('🔲 QR Code recebido via SignalR');
-      this.whatsappStatusSubject.next({
-        sessionName: data.sessionName,
-        status: 'SCAN_QR_CODE',
-        qrCode: data.qrCode,
-        message: 'QR Code gerado. Escaneie no WhatsApp.',
-        timestamp: new Date()
-      });
+    // Confirmação de conexão
+    this.hubConnection.on('OnConnected', (data: OnConnectedData) => {
+      console.log('🔗 Conectado ao hub SignalR:', data);
+      this.onConnectedSubject.next(data);
     });
 
-    // Evento: WhatsApp conectado
-    this.hubConnection.on('WhatsAppConectado', (data: { sessionName: string; telefone: string }) => {
-      console.log('✅ WhatsApp conectado via SignalR');
-      this.whatsappStatusSubject.next({
-        sessionName: data.sessionName,
-        status: 'WORKING',
-        telefone: data.telefone,
-        message: 'WhatsApp conectado com sucesso',
-        timestamp: new Date()
-      });
+    // Status de sessão atualizado
+    this.hubConnection.on('ReceberStatusSessao', (data: StatusSessaoData) => {
+      console.log('🔄 Status da sessão atualizado:', data);
+      this.statusSessaoSubject.next(data);
     });
 
-    // Evento: WhatsApp desconectado
-    this.hubConnection.on('WhatsAppDesconectado', (data: { sessionName: string; motivo?: string }) => {
-      console.log('❌ WhatsApp desconectado via SignalR');
-      this.whatsappStatusSubject.next({
-        sessionName: data.sessionName,
-        status: 'STOPPED',
-        message: data.motivo || 'WhatsApp desconectado',
-        timestamp: new Date()
-      });
+    // QR Code gerado
+    this.hubConnection.on('QRCodeGerado', (data: QRCodeData) => {
+      console.log('📱 QR Code gerado:', data);
+      this.qrCodeGeradoSubject.next(data);
     });
 
-    // Eventos de conexão
+    // WhatsApp conectado
+    this.hubConnection.on('WhatsAppConectado', (data: WhatsAppConectadoData) => {
+      console.log('✅ WhatsApp conectado:', data);
+      this.whatsappConectadoSubject.next(data);
+    });
+
+    // WhatsApp desconectado
+    this.hubConnection.on('WhatsAppDesconectado', (data: WhatsAppDesconectadoData) => {
+      console.log('❌ WhatsApp desconectado:', data);
+      this.whatsappDesconectadoSubject.next(data);
+    });
+
+    // Resposta ao Ping
+    this.hubConnection.on('Pong', (data: PongData) => {
+      console.log('🏓 Pong recebido:', data);
+      this.pongSubject.next(data);
+    });
+
+    // Cliente atualizado
+    this.hubConnection.on('ClienteAtualizado', (data: ClienteAtualizadoData) => {
+      console.log('👤 Cliente atualizado:', data);
+      this.clienteAtualizadoSubject.next(data);
+    });
+
+    // Eventos de reconexão
     this.hubConnection.onreconnecting((error) => {
-      console.warn('🔄 SignalR reconectando...', error);
+      console.warn('⚠️ SignalR reconectando...', error);
       this.connectionStateSubject.next(false);
     });
 
@@ -196,7 +291,21 @@ export class SignalRHubService {
   }
 
   /**
+   * Envia um ping para o servidor para verificar se a conexão está ativa
+   * Resposta: evento 'Pong' com { timestamp, connectionId }
+   */
+  public async ping(): Promise<void> {
+    try {
+      await this.invokeMethod('Ping');
+      console.log('🏓 Ping enviado ao servidor');
+    } catch (error) {
+      console.error('Erro ao enviar ping:', error);
+    }
+  }
+
+  /**
    * Inscreve-se em um grupo específico (por exemplo, para receber atualizações de uma sessão específica)
+   * NOTA: A conexão é automaticamente adicionada ao grupo da empresa ao conectar
    */
   public async joinGroup(groupName: string): Promise<void> {
     try {

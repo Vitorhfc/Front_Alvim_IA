@@ -4,7 +4,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable, throwError, firstValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../Environment/Environment';
-import { ApiResponse, isSuccessResponse } from '../../Models/api-response.model';
+import { ApiResponse, isSuccessResponse } from '../../Models/Objetos/api-response.model';
 import { Empresa } from '../../Models/Entidades/Adm/Empresa';
 
 /**

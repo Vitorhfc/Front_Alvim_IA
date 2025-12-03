@@ -7,7 +7,9 @@ import { SidebarComponent } from '../../Components/sidebar/sidebar.component';
 import { ClientService } from '../../Service/Api/client.service';
 import { SnackbarService } from '../../Service/snackbar';
 import { Cliente, StatusConversa } from '../../Models/Entidades/Client/Cliente';
-import { Mensagem as MensagemAPI, ContagemMensagens } from '../../Models/Entidades/Client/Mensagem';
+import { Mensagem as MensagemAPI, ContagemMensagens, TipoMensagem } from '../../Models/Entidades/Client/Mensagem';
+import { SignalRHubService, MensagemWhatsApp, ClienteAtualizadoData } from '../../Service/signalr-hub.service';
+import { ConfirmationModalComponent } from '../../Components/confirmation-modal/confirmation-modal.component';
 
 interface MensagemView {
   id: string;
@@ -19,7 +21,7 @@ interface MensagemView {
 @Component({
   selector: 'app-cliente',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent],
   templateUrl: './cliente.html',
   styleUrl: './cliente.scss',
 })
@@ -44,6 +46,10 @@ export class ClienteComponent implements OnInit, OnDestroy {
   contagemMensagens: ContagemMensagens | null = null;
   loadingContagem: boolean = false;
 
+  // Modal de confirmação de atualização
+  mostrarModalAtualizacao: boolean = false;
+  clienteAtualizadoBuffer: Cliente | null = null;
+
   // Gerenciamento de subscrições
   private destroy$ = new Subject<void>();
 
@@ -52,13 +58,15 @@ export class ClienteComponent implements OnInit, OnDestroy {
     private router: Router,
     private clientService: ClientService,
     private snackbarService: SnackbarService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private signalRService: SignalRHubService
   ) { }
 
   ngOnInit(): void {
     const clienteId = this.route.snapshot.paramMap.get('id');
     if (clienteId) {
       this.carregarCliente(clienteId);
+      this.configurarSignalR();
     } else {
       this.error = 'ID do cliente não fornecido';
       this.loading = false;
@@ -145,6 +153,180 @@ export class ClienteComponent implements OnInit, OnDestroy {
       this.loadingContagem = false;
       this.cdr.detectChanges();
     }
+  }
+
+  // ==================== SIGNALR ====================
+
+  /**
+   * Configura os listeners do SignalR para receber mensagens em tempo real
+   * A conexão já foi iniciada no ConversasComponent
+   */
+  private configurarSignalR(): void {
+    // Escutar novas mensagens
+    this.signalRService.mensagemRecebida$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((mensagemWhatsApp: MensagemWhatsApp) => {
+        this.handleNovaMensagemWhatsApp(mensagemWhatsApp);
+      });
+
+    // Escutar estado da conexão
+    this.signalRService.connectionState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((connected: boolean) => {
+        if (connected) {
+          console.log('✅ SignalR conectado - Cliente em tempo real');
+        }
+      });
+
+    // Escutar atualizações de cliente
+    this.signalRService.clienteAtualizado$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((clienteAtualizadoData: ClienteAtualizadoData) => {
+        this.handleClienteAtualizadoSignalR(clienteAtualizadoData);
+      });
+  }
+
+  /**
+   * Manipula nova mensagem recebida via SignalR
+   * Só processa se for do cliente atual
+   */
+  private handleNovaMensagemWhatsApp(mensagemWhatsApp: MensagemWhatsApp): void {
+    try {
+      const payload = mensagemWhatsApp.payload;
+
+      if (!payload || !payload.clienteId || !this.cliente) {
+        return;
+      }
+
+      // Só processar se for mensagem do cliente atual
+      if (payload.clienteId !== this.cliente.id) {
+        return;
+      }
+
+      console.log('📨 Nova mensagem recebida para este cliente:', payload);
+
+      // Atualizar última interação
+      this.cliente.dtUltimaInteracao = new Date();
+
+      // Se está na aba de mensagens, adicionar mensagem na lista
+      if (this.activeTab === 'mensagens') {
+        this.adicionarMensagemNaLista(payload);
+      }
+
+      // Atualizar contagem de mensagens
+      if (this.contagemMensagens) {
+        this.contagemMensagens.totalMensagens++;
+        if (payload.flgMensagemCliente) {
+          this.contagemMensagens.mensagensCliente++;
+        } else {
+          this.contagemMensagens.mensagensResponsavel++;
+        }
+      }
+
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Erro ao processar mensagem do SignalR:', error);
+    }
+  }
+
+  /**
+   * Adiciona nova mensagem na lista de mensagens
+   */
+  private adicionarMensagemNaLista(payloadMensagem: any): void {
+    const novaMensagem: MensagemView = {
+      id: payloadMensagem.id || `signalr_${Date.now()}`,
+      remetenteId: payloadMensagem.clienteId || 'Sistema',
+      texto: payloadMensagem.conteudoTexto || this.obterTextoTipoMensagem(payloadMensagem.tipoMensagem),
+      dtEnvio: new Date()
+    };
+
+    this.mensagens.push(novaMensagem);
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Obtém texto descritivo para tipos de mensagem não-texto
+   */
+  private obterTextoTipoMensagem(tipo: TipoMensagem): string {
+    const tiposTexto: Record<number, string> = {
+      [TipoMensagem.Audio]: '🎤 Áudio',
+      [TipoMensagem.Imagem]: '📷 Imagem',
+      [TipoMensagem.Video]: '🎥 Vídeo',
+      [TipoMensagem.Documento]: '📄 Documento',
+      [TipoMensagem.Contato]: '👤 Contato',
+      [TipoMensagem.Localizacao]: '📍 Localização',
+      [TipoMensagem.Sticker]: '🎨 Sticker'
+    };
+    return tiposTexto[tipo] || 'Mensagem';
+  }
+
+  /**
+   * Manipula atualização de cliente via SignalR
+   * Se o usuário estiver em modo de edição, exibe modal de confirmação
+   * Caso contrário, atualiza automaticamente
+   */
+  private handleClienteAtualizadoSignalR(clienteAtualizadoData: ClienteAtualizadoData): void {
+    try {
+      const clienteAtualizado = clienteAtualizadoData.cliente;
+
+      if (!clienteAtualizado || !clienteAtualizado.id || !this.cliente) {
+        return;
+      }
+
+      // Só processar se for o cliente atual
+      if (clienteAtualizado.id !== this.cliente.id) {
+        return;
+      }
+
+      console.log('👤 Cliente atual foi atualizado via SignalR:', clienteAtualizado);
+
+      // Se estiver em modo de edição, exibir modal de confirmação
+      if (this.editMode) {
+        this.clienteAtualizadoBuffer = clienteAtualizado;
+        this.mostrarModalAtualizacao = true;
+        this.cdr.detectChanges();
+      } else {
+        // Atualizar automaticamente se não estiver editando
+        this.aplicarAtualizacaoCliente(clienteAtualizado);
+      }
+    } catch (error) {
+      console.error('Erro ao processar atualização de cliente do SignalR:', error);
+    }
+  }
+
+  /**
+   * Aplica a atualização do cliente recebida via SignalR
+   */
+  private aplicarAtualizacaoCliente(clienteAtualizado: Cliente): void {
+    this.cliente = clienteAtualizado;
+    this.formData = { ...clienteAtualizado };
+    this.cdr.detectChanges();
+    console.log('✅ Cliente atualizado com sucesso');
+  }
+
+  /**
+   * Confirma a atualização do cliente (chamado pelo modal)
+   * Perde as edições locais e aplica os dados do servidor
+   */
+  confirmarAtualizacaoCliente(): void {
+    if (this.clienteAtualizadoBuffer) {
+      this.aplicarAtualizacaoCliente(this.clienteAtualizadoBuffer);
+      this.editMode = false;
+      this.clienteAtualizadoBuffer = null;
+    }
+    this.mostrarModalAtualizacao = false;
+    this.cdr.detectChanges();
+    this.snackbarService.info('Cliente atualizado com as informações mais recentes do servidor');
+  }
+
+  /**
+   * Cancela a atualização do cliente (chamado pelo modal)
+   * Mantém as edições locais
+   */
+  cancelarAtualizacaoCliente(): void {
+    this.clienteAtualizadoBuffer = null;
+    this.mostrarModalAtualizacao = false;
+    this.cdr.detectChanges();
   }
 
   // ==================== AÇÕES ====================

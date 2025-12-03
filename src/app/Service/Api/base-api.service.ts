@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { ApiResponse } from '../../Models/api-response.model';
+import { ApiResponse } from '../../Models/Objetos/api-response.model';
 import { LocalStorageService } from '../Local/local-storage';
 
 /**

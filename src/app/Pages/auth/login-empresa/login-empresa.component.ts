@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../Service/Api/auth.service';
 import { SpinnerService } from '../../../Service/Local/spinner';
 import { SnackBar } from '../../../Service/Local/snack-bar';
+import { SignalRHubService } from '../../../Service/signalr-hub.service';
 
 @Component({
   selector: 'app-login-empresa',
@@ -22,10 +23,14 @@ export class LoginEmpresaComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private spinnerService: SpinnerService,
-    private snackBar: SnackBar
+    private snackBar: SnackBar,
+    private signalRService: SignalRHubService
   ) { }
 
   ngOnInit(): void {
+    // Limpar TODO o localStorage antes de autenticar novamente
+    localStorage.clear();
+
     this.authService.logout();
 
     this.route.params.subscribe(params => {
@@ -70,6 +75,9 @@ export class LoginEmpresaComponent implements OnInit {
       });
 
       this.authService.salvarDadosAutenticacao(response);
+
+      // Conectar ao SignalR após autenticação bem-sucedida
+      await this.signalRService.startConnection();
 
       this.snackBar.success('Login realizado com sucesso!');
 

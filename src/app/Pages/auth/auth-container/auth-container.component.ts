@@ -12,6 +12,7 @@ import { CadastroEmpresaComponent } from '../cadastro-empresa/cadastro-empresa.c
 import { AuthState, AuthStep, Selecao2FAData, Validacao2FAData } from '../shared/models/auth-state.model';
 import { EmpresaVinculadaModel, LoginModel } from '../../../Models/Objetos/auth.model';
 import { AuthService } from '../../../Service/Api/auth.service';
+import { SignalRHubService } from '../../../Service/signalr-hub.service';
 
 @Component({
   selector: 'app-auth-container',
@@ -38,7 +39,8 @@ export class AuthContainerComponent {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private signalRService: SignalRHubService
   ) {}
 
   // ==================== EVENTOS DO LOGIN ====================
@@ -161,9 +163,13 @@ export class AuthContainerComponent {
    * Empresa selecionada com sucesso:
    * - O componente de seleção já fez login no CLIENT
    * - Já salvou o token JWT final
+   * - Conecta ao SignalR
    * - Redireciona para dashboard
    */
-  onEmpresaSelecionada(): void {
+  async onEmpresaSelecionada(): Promise<void> {
+    // Conectar ao SignalR após seleção de empresa
+    await this.signalRService.startConnection();
+
     this.router.navigate(['/dashboard']);
   }
 
@@ -185,9 +191,13 @@ export class AuthContainerComponent {
    * - O componente de cadastro já fez login no CLIENT
    * - Já salvou o token JWT final
    * - Já limpou o token ADM temporário
+   * - Conecta ao SignalR
    * - Redireciona para dashboard
    */
-  onEmpresaCadastradaComSucesso(): void {
+  async onEmpresaCadastradaComSucesso(): Promise<void> {
+    // Conectar ao SignalR após cadastro de empresa
+    await this.signalRService.startConnection();
+
     this.router.navigate(['/dashboard']);
   }
 

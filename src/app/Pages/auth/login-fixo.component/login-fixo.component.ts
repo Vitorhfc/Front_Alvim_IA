@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../Service/Api/auth.service';
 import { SpinnerService } from '../../../Service/Local/spinner';
 import { SnackBar } from '../../../Service/Local/snack-bar';
+import { SignalRHubService } from '../../../Service/signalr-hub.service';
 
 @Component({
   selector: 'app-login-fixo',
@@ -13,7 +14,7 @@ import { SnackBar } from '../../../Service/Local/snack-bar';
   styleUrls: ['./login-fixo.component.scss']
 })
 export class LoginFixoComponent implements OnInit {
-  empresaId: string = '691e1dab8a5dcf6219a935e4'; // ID padrão
+  empresaId: string = '690df402c4066150d1e1f899'; // ID padrão
   loading: boolean = true;
   error: string | null = null;
 
@@ -22,7 +23,8 @@ export class LoginFixoComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private spinnerService: SpinnerService,
-    private snackBar: SnackBar
+    private snackBar: SnackBar,
+    private signalRService: SignalRHubService
   ) { }
 
   ngOnInit(): void {
@@ -49,6 +51,9 @@ export class LoginFixoComponent implements OnInit {
       });
 
       this.authService.salvarDadosAutenticacao(response);
+
+      // Conectar ao SignalR após autenticação bem-sucedida
+      await this.signalRService.startConnection();
 
       this.snackBar.success('Login realizado com sucesso!');
 

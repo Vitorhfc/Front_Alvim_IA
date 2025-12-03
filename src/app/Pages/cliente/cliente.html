@@ -409,4 +409,16 @@
       </div>
     </section>
   </div>
+
+  <!-- Modal de Confirmação de Atualização -->
+  <app-confirmation-modal
+    [isOpen]="mostrarModalAtualizacao"
+    [title]="'Cliente Atualizado'"
+    [message]="'Este cliente foi atualizado por outro usuário ou sistema. Deseja atualizar as informações exibidas? Suas edições não salvas serão perdidas.'"
+    [confirmText]="'Atualizar Cliente'"
+    [cancelText]="'Manter Minhas Edições'"
+    [confirmButtonClass]="'btn-warning'"
+    (confirm)="confirmarAtualizacaoCliente()"
+    (cancel)="cancelarAtualizacaoCliente()">
+  </app-confirmation-modal>
 </main>
