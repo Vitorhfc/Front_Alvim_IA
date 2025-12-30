@@ -63,6 +63,44 @@ export class LocalStorageService {
   }
 
   /**
+   * Limpa COMPLETAMENTE todos os dados armazenados no navegador
+   * - localStorage inteiro
+   * - sessionStorage inteiro
+   * - Todos os cookies
+   */
+  limparTudo(): void {
+    if (this.isBrowser()) {
+      // Limpar localStorage completo
+      localStorage.clear();
+
+      // Limpar sessionStorage completo
+      sessionStorage.clear();
+
+      // Limpar todos os cookies
+      this.limparCookies();
+    }
+  }
+
+  /**
+   * Remove todos os cookies do domínio atual
+   */
+  private limparCookies(): void {
+    if (this.isBrowser()) {
+      const cookies = document.cookie.split(';');
+
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf('=');
+        const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+
+        // Remove o cookie configurando data de expiração no passado
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+      }
+    }
+  }
+
+  /**
    * Obtém o ID da empresa do usuário logado
    * Retorna null se não houver usuário logado ou empresa vinculada
    */

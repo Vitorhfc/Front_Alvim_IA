@@ -5,6 +5,7 @@ import { AuthService } from '../../../Service/Api/auth.service';
 import { SpinnerService } from '../../../Service/Local/spinner';
 import { SnackBar } from '../../../Service/Local/snack-bar';
 import { SignalRHubService } from '../../../Service/signalr-hub.service';
+import { LocalStorageService } from '../../../Service/Local/local-storage';
 
 @Component({
   selector: 'app-login-empresa',
@@ -24,14 +25,13 @@ export class LoginEmpresaComponent implements OnInit {
     private authService: AuthService,
     private spinnerService: SpinnerService,
     private snackBar: SnackBar,
-    private signalRService: SignalRHubService
+    private signalRService: SignalRHubService,
+    private localStorageService: LocalStorageService
   ) { }
 
   ngOnInit(): void {
-    // Limpar TODO o localStorage antes de autenticar novamente
-    localStorage.clear();
-
-    this.authService.logout();
+    // Limpar COMPLETAMENTE todos os dados armazenados antes de autenticar novamente
+    this.limparTodosDados();
 
     this.route.params.subscribe(params => {
       this.empresaId = params['empresaId'];
@@ -42,6 +42,21 @@ export class LoginEmpresaComponent implements OnInit {
         this.aguardarPostMessage();
       }
     });
+  }
+
+  /**
+   * Limpa completamente todos os dados armazenados no navegador
+   * - localStorage completo
+   * - sessionStorage completo
+   * - Todos os cookies
+   * - Bearer token via AuthService
+   */
+  private limparTodosDados(): void {
+    // Limpar TUDO usando o LocalStorageService
+    this.localStorageService.limparTudo();
+
+    // Chamar logout do AuthService (remove bearer token e dados específicos)
+    this.authService.logout();
   }
 
   private aguardarPostMessage(): void {
